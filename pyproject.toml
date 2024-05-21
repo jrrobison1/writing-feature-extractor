@@ -7,6 +7,12 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.10"
+langchain = "^0.2.0"
+langgraph = "^0.0.54"
+langchain-groq = "^0.1.4"
+langchain-google-genai = "^1.0.4"
+langchain-google-vertexai = "^1.0.4"
+langchain-anthropic = "^0.1.13"
 
 
 [build-system]
