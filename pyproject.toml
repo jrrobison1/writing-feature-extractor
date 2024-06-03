@@ -13,6 +13,10 @@ langchain-groq = "^0.1.4"
 langchain-google-genai = "^1.0.4"
 langchain-google-vertexai = "^1.0.4"
 langchain-anthropic = "^0.1.13"
+textstat = "^0.7.3"
+langchain-openai = "^0.1.8"
+pandas = "^2.2.2"
+matplotlib = "^3.9.0"
 
 
 [build-system]
