@@ -1,176 +1,255 @@
-import json
-from langchain_groq import ChatGroq
+import logging
+import sys
 import textstat
-import pandas as pd
-import matplotlib.pyplot as plt
 
-# from langchain_openai import ChatOpenAI
+from langchain_core.pydantic_v1 import Field, create_model
+
+from langchain_groq import ChatGroq
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_google_vertexai import ChatVertexAI
 from langchain_anthropic import ChatAnthropic
 from langchain_openai import ChatOpenAI
-from langchain_core.prompts import PromptTemplate
-from structures import Features, Pace
+
+from prompt_templates.basic_prompt import prompt_template
 from utils.text_metrics import calculate_dialogue_percentage
+from utils.text_metrics import combine_short_strings
+from figure_plotter import get_graph
+
+from features.mood_feature import MoodFeature
+from features.mystery_level_feature import MysteryLevelFeature
+from features.emotional_intensity_feature import EmotionalIntensityFeature
+from features.pace_feature import PaceFeature
 
 
-def get_number_for_pace(pace: Pace):
-    if pace == Pace.VERY_SLOW:
-        return 1
-    if pace == Pace.SLOW:
-        return 2
-    if pace == Pace.MEDIUM_SLOW:
-        return 3
-    if pace == Pace.MEDIUM:
-        return 4
-    if pace == Pace.MEDIUM_FAST:
-        return 5
-    if pace == Pace.FAST:
-        return 6
-    if pace == Pace.VERY_FAST:
-        return 7
-    return 0
+logger = logging.getLogger(__name__)
 
-
-def get_graph(paragraph_numbers, pace_numbers, paragraphs):
-    # Example data
-    data = {
-        "Paragraph": paragraph_numbers,
-        # "Paragraph": [1, 2, 3, 4, 5, 6, 7],
-        "Pacing": pace_numbers,
-        # "Pacing": [1, 2, 3, 7, 2, 6, 4],
-        "Text": paragraphs,
-        # "Text": [
-        #     "This is a short paragraph.",
-        #     "This is a slightly longer paragraph with more words.",
-        #     "This is the longest paragraph of all, with even more words than the previous one.",
-        #     "Short again.",
-        #     "More and more and more and More and more text",
-        #     "Wow even more text here. Wow wow wow." "Moderate length paragraph here.",
-        #     "Here's some more." "And here's lots and lots and lots and lots of words!",
-        # ],
-    }
-
-    # Calculate the length of each paragraph
-    df = pd.DataFrame(data)
-    df["Length"] = df["Text"].apply(lambda x: len(x.split()))
-
-    # Normalize lengths to fit a reasonable bar width range
-    max_width = 0.4  # Maximum width of the bars
-    min_width = 0.1  # Minimum width of the bars
-    df["Width"] = (
-        (df["Length"] - df["Length"].min()) / (df["Length"].max() - df["Length"].min())
-    ) * (max_width - min_width) + min_width
-
-    # Calculate positions
-    positions = [sum(df["Width"][:i]) for i in range(len(df))]
-    center_positions = [pos + df["Width"][i] / 2 for i, pos in enumerate(positions)]
-
-    # Plotting
-    fig, ax = plt.subplots(figsize=(10, 6))
-
-    # Plot bars with varying widths and black borders
-    for index, row in df.iterrows():
-        ax.bar(
-            positions[index],
-            row["Pacing"],
-            width=row["Width"],
-            color="green",
-            edgecolor="black",
-            align="edge",
-            hatch="//",
-        )
-
-    ax.set_xlabel("Paragraph")
-    ax.set_ylabel("Pacing")
-    ax.set_title("Pacing Changes Throughout the Chapter with Variable Widths")
-    ax.set_xticks(center_positions)  # Center x-ticks under each bar
-    ax.set_xticklabels(df["Paragraph"])  # Label x-axis with paragraph numbers
-    ax.set_yticks([1, 2, 3, 4, 5, 6, 7])
-    ax.set_yticklabels(
-        [
-            "Very Slow",
-            "Slow",
-            "Medium-Slow",
-            "Medium",
-            "Medium-Fast",
-            "Fast",
-            "Very Fast",
-        ]
-    )  # Label y-axis with pacing categories
-
-    # Turn off horizontal grid lines
-    ax.yaxis.grid(False)
-
-    plt.show()
-
-
-filename = "Death_Drive_73.txt"
-with open(filename) as f:
-    file_text = f.read()
-    f.close()
-
-sections = file_text.split("***")
-
-# def extract_features(text: str) -> dict[str, str]:
-prompt_template = PromptTemplate.from_template(
-    template="""Extract features from the following creative writing:
------
-{input}
------
-"""
+# Configure logging
+logging.basicConfig(
+    level=logging.ERROR,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[logging.FileHandler("app.log"), logging.StreamHandler(sys.stdout)],
 )
-# Run LLM to extract features from the text
+logging.getLogger(__name__).setLevel(logging.INFO)
+
+
+SECTION_DELIMETER = "***"
+
+
+def get_int_for_emotional_intensity(
+    emotional_intensity: EmotionalIntensityFeature.EmotionalIntensity,
+):
+    if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.NONE:
+        return 0
+    if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.VERY_LOW:
+        return 1
+    if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.LOW:
+        return 2
+    if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.MEDIUM_LOW:
+        return 3
+    if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.MEDIUM:
+        return 4
+    if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.MEDIUM_HIGH:
+        return 5
+    if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.HIGH:
+        return 6
+    if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.VERY_HIGH:
+        return 7
+
+
+def get_number_for_pace(pace: PaceFeature.Pace):
+    # if pace == PaceFeature.Pace.VERY_SLOW:
+    #     return 1
+    if pace == PaceFeature.Pace.SLOW:
+        return 1
+    # if pace == PaceFeature.Pace.MEDIUM_SLOW:
+    #     return 3
+    if pace == PaceFeature.Pace.MEDIUM:
+        return 2
+    # if pace == PaceFeature.Pace.MEDIUM_FAST:
+    #     return 5
+    if pace == PaceFeature.Pace.FAST:
+        return 3
+    # if pace == PaceFeature.Pace.VERY_FAST:
+    #     return 7
+
+
+def get_number_for_mystery_level(pace: MysteryLevelFeature.MysteryLevel):
+    # if pace == PaceFeature.Pace.VERY_SLOW:
+    #     return 1
+    if pace == PaceFeature.Pace.SLOW:
+        return 2
+    # if pace == PaceFeature.Pace.MEDIUM_SLOW:
+    #     return 3
+    if pace == PaceFeature.Pace.MEDIUM:
+        return 4
+    # if pace == PaceFeature.Pace.MEDIUM_FAST:
+    #     return 5
+    if pace == PaceFeature.Pace.FAST:
+        return 6
+    # if pace == PaceFeature.Pace.VERY_FAST:
+    #     return 7
+
+
+mystery_level_feature = MysteryLevelFeature()
+mood_feature = MoodFeature()
+pace_feature = PaceFeature()
+emotional_intensity_feature = EmotionalIntensityFeature()
+selected_features = dict()
+
+# Mystery Level Feature
+selected_features[mystery_level_feature.get_pydantic_feature_label()] = (
+    mystery_level_feature.get_pydantic_feature_type(),
+    Field(
+        ...,
+        description="Level of mystery in the text. Can be 'low', 'medium', 'high', or 'none'.",
+    ),
+)
+
+# Mood Feature
+selected_features[mood_feature.get_pydantic_feature_label()] = (
+    mood_feature.get_pydantic_feature_type(),
+    Field(
+        ...,
+        description="Mood of the text. The mood MUST be one of these selections. If the mood is not listed, choose the closest semantic match.",
+    ),
+)
+
+# Emotional Intensity Feature
+selected_features[emotional_intensity_feature.get_pydantic_feature_label()] = (
+    emotional_intensity_feature.get_pydantic_feature_type(),
+    Field(
+        ...,
+        description="Strength or intensity of emotions expressed in the text.",
+    ),
+)
+
+# Pace Feature
+selected_features[pace_feature.get_pydantic_feature_label()] = (
+    pace_feature.get_pydantic_feature_type(),
+    Field(
+        ...,
+        description="Pace/speed of the narrative. Can be 'very slow', 'slow', 'medium slow', 'medium', 'medium fast', 'fast', or 'very fast'.",
+    ),
+)
+
+DynamicFeatureModel = create_model(
+    "DynamicFeatureModel",
+    __doc__="Features contained in the creative writing text",
+    **selected_features,
+)
+
+
+def get_text_statistics(text: str) -> dict[str]:
+    text_statistics = dict()
+    dialogue_percentage = calculate_dialogue_percentage(text)
+    dp_as_string = f"{dialogue_percentage:.2f}%"
+    text_statistics["dialogue_percentage"] = dp_as_string
+    text_statistics["readability_ease"] = textstat.flesch_reading_ease(text)
+    text_statistics["readability_grade"] = textstat.flesch_kincaid_grade(text)
+    text_statistics["sentence_count"] = textstat.sentence_count(text)
+    text_statistics["word_count"] = textstat.lexicon_count(text, removepunct=True)
+
+    return text_statistics
+
+
 # llm = ChatAnthropic(
 #     model="claude-3-opus-20240229", temperature=0
 # ).with_structured_output(Features)
 # llm = ChatAnthropic(model_name="claude-3-sonnet-20240229", temperature=0).with_structured_output(Features)
-# llm = ChatAnthropic(model_name="claude-3-haiku-20240307", temperature=0).with_structured_output(Features)
+# llm = ChatAnthropic(
+#     model_name="claude-3-haiku-20240307", temperature=0
+# ).with_structured_output(Features)
 # llm = ChatVertexAI(model="gemini-1.5-pro-latest", temperature=0).with_structured_output(Features)
 # llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro-latest", temperature=0)
-# llm = ChatOpenAI(model="gpt-4o", temperature=0).with_structured_output(Features)
-llm = ChatGroq(model_name="llama3-70b-8192", temperature=0).with_structured_output(
-    Features
+llm = ChatOpenAI(model="gpt-4o", temperature=0).with_structured_output(
+    DynamicFeatureModel
 )
-raw_data_sections = []
-for section in sections:
-    try:
+# llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0).with_structured_output(
+#     DynamicFeatureModel
+# )
 
-        print(f"----------SECTION BEGIN----------")
-        paragraph_metadata = []
-        this_paragraph_pace_data = []
-        paragraphs = section.split("\n")
-        for paragraph in paragraphs:
-            # if len(paragraph) < 10:
-            #     paragraphs.remove(paragraph)
-            #     continue
-            result = llm.invoke(prompt_template.format(input=paragraph))
-            dialogue_percentage = calculate_dialogue_percentage(paragraph)
 
-            dp_as_string = f"{dialogue_percentage:.2f}%"
-            as_dict = result.dict()
-            as_dict["dialogue_percentage"] = dp_as_string
-            as_dict["readability_ease"] = textstat.flesch_reading_ease(paragraph)
-            as_dict["readability_grade"] = textstat.flesch_kincaid_grade(paragraph)
-            as_dict["sentence_count"] = textstat.sentence_count(paragraph)
-            as_dict["word_count"] = textstat.lexicon_count(paragraph, removepunct=True)
-
-            paragraph_metadata.append(as_dict)
-            this_paragraph_pace_data.append(get_number_for_pace(as_dict["pace"]))
-
-            # print(json.dumps(as_dict, indent=2))
-
-        for pm in paragraph_metadata:
-            print(pm["pace"])
-        paragraph_numbers = list(range(len(this_paragraph_pace_data)))
-
+# Together.ai
+# llm = ChatOpenAI(
+#     base_url="https://api.together.xyz/v1",
+#     api_key="8ad294d976b5b5eb6d0e65c27b6b793db049edc05e79ae21ad4011ba78001d41",
+#     model="meta-llama/Llama-3-8b-hf",
+#     temperature=0,
+# )
+# llm = ChatGroq(model_name="llama3-8b-8192", temperature=0).with_structured_output(
+#     Features
+# )
+def extract_features(sections: list[str]):
+    for section in sections:
         try:
-            get_graph(paragraph_numbers, this_paragraph_pace_data, paragraphs)
-        except Exception as e:
-            print(e)
+            print(f"----------SECTION BEGIN----------")
+            paragraph_metadata = []
+            this_paragraph_pace_data = []
+            this_paragraph_mood = []
+            # this_paragraph_suspense = []
+            this_paragraph_emotional_intensity = []
+            this_paragraph_mystery_level = []
+            paragraphs = section.split("\n")
+            for paragraph in paragraphs:
+                paragraphs = combine_short_strings(paragraphs)
+                try:
+                    try:
+                        result = llm.invoke(prompt_template.format(input=paragraph))
+                        print(f"Result: [{str(result)}]")
+                    except Exception as e:
+                        logger.error(f"Exception is: [{e}]")
 
-        print(f"----------SECTION END----------\n\n")
-    except Exception as e:
-        print(e)
-        continue
-# result = llm.invoke(prompt_template.format(creative_writing))
+                    result_dict = result.dict()
+                    # result_dict["text_statistics"] = get_text_statistics(paragraph)
+
+                    paragraph_metadata.append(result_dict)
+                    this_paragraph_mood.append(result_dict["mood"])
+                    this_paragraph_pace_data.append(
+                        get_number_for_pace(result_dict["pace"])
+                    )
+                    this_paragraph_emotional_intensity.append(
+                        get_int_for_emotional_intensity(
+                            result_dict["emotional_intensity"]
+                        )
+                    )
+                    this_paragraph_mystery_level.append(
+                        MysteryLevelFeature.get_int_value_for_enum(
+                            result_dict["mystery_level"]
+                        )
+                    )
+                except Exception as e:
+                    logger.error(f"Second exception: [{e}]")
+                    continue
+
+            for pm in paragraph_metadata:
+                print(pm["pace"])
+                print(pm["mood"])
+                print(pm["emotional_intensity"])
+                print(pm["mystery_level"])
+            paragraph_numbers = list(range(1, len(paragraphs) + 1))
+
+            try:
+                get_graph(
+                    paragraph_numbers,
+                    this_paragraph_pace_data,
+                    paragraphs,
+                    this_paragraph_mood,
+                    this_paragraph_emotional_intensity,
+                    this_paragraph_mystery_level,
+                )
+            except Exception as e:
+                logger.error(e)
+
+            print(f"----------SECTION END----------\n\n")
+        except Exception as e:
+            logger.error(e)
+            continue
+
+
+if __name__ == "__main__":
+    with open(sys.argv[1]) as f:
+        file_text = f.read()
+        f.close()
+
+    sections = file_text.split(SECTION_DELIMETER)
+    extract_features(sections)

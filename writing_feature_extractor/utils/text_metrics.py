@@ -20,3 +20,15 @@ def calculate_dialogue_percentage(text):
     )
 
     return dialogue_percentage
+
+
+def combine_short_strings(strings: list[str], minimum_words=5) -> list[str]:
+    i = 0
+    while i < len(strings) - 1:
+        if (len(strings[i].split()) < minimum_words) and (len(strings[i]) > 0):
+            print(f"Combining [{strings[i]}] and [{strings[i + 1]}]")
+            strings[i + 1] = strings[i] + " " + strings[i + 1]
+            strings.pop(i)
+        else:
+            i += 1
+    return strings

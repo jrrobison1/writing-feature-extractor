@@ -2,23 +2,28 @@ from enum import Enum
 from typing import List
 from langchain_core.pydantic_v1 import BaseModel, Field
 
-
-class NarrativeRichPace(str, Enum):
-    LEISURELY = "leisurely"
-    STEADY = "steady"
-    BRISK = "brisk"
-    HURRIED = "hurried"
-    INTERRUPTED = "interrupted"
+from writing_feature_extractor.features.mystery_level_feature import MysteryLevelFeature
+from writing_feature_extractor.features.mood_feature import MoodFeature
 
 
-class Pace(str, Enum):
-    VERY_SLOW = "very slow"
-    SLOW = "slow"
-    MEDIUM_SLOW = "medium slow"
+class EmotionalIntensity(str, Enum):
+    """Strength or intensity of emotions expressed in the text. Can be 'very low', 'low', 'medium low', 'medium', 'medium high', 'high', or 'very high'."""
+
+    VERY_LOW = "very low"
+    LOW = "low"
+    MEDIUM_LOW = "medium low"
     MEDIUM = "medium"
-    MEDIUM_FAST = "medium fast"
-    FAST = "fast"
-    VERY_FAST = "very fast"
+    MEDIUM_HIGH = "medium high"
+    HIGH = "high"
+    VERY_HIGH = "very high"
+
+
+class LevelOfSuspense(str, Enum):
+    """Level of suspense in the text. Can be 'low', 'medium', or 'high'."""
+
+    LOW = "low"
+    MEDIUM = "medium"
+    HIGH = "high"
 
 
 class Genre(str, Enum):
@@ -54,12 +59,29 @@ class Features(BaseModel):
     """Features contained in the creative writing text"""
 
     # tone: str = Field(description="Tone of the text")
-    pace: Pace = Field(description="Pace/speed of the narrative")
-    # narrative_rich_pace: NarrativeRichPace = Field(
-    #     description="Pace of the narrative more in terms of context and richness"
+    # pace: Pace = Field(
+    #     description="Pace/speed of the narrative. Can be 'very slow', 'slow', 'medium slow', 'medium', 'medium fast', 'fast', or 'very fast'."
     # )
+    mood: MoodFeature.Mood = Field(
+        ...,
+        description="Mood of the text. The mood MUST be one of these selections. If the mood is not listed, choose the closest semantic match.",
+    )
+    # emotional_intensity: EmotionalIntensity = Field(
+    #     description="Strength or intensity of emotions expressed in the text. Can be 'very low', 'low', 'medium low', 'medium', 'medium high', 'high', or 'very high'."
+    # )
+    mystery_level: MysteryLevelFeature.MysteryLevel = Field(
+        ...,
+        description="Level of mystery in the text. Can be 'low', 'medium', 'high', or 'none'.",
+    )
+
+    # level_of_suspense: LevelOfSuspense = Field(
+    #     """Level of suspense in the text. Can be 'low', 'medium', or 'high'."""
+    # )
+    # mood: Union[Mood, Tuple[Mood, ...]] = Field(
+    #     description="Mood of the text. The mood MUST be one or two of these selections. If the mood is not listed, choose the closest semantic match."
+    # )
+
     # genre: Genre = Field(description="Genre of the text")
-    # mood: str = Field(description="[cheerful, gloomy, suspenseful, nostalgic, etc.]")
     # pov: str = Field(
     #     description="[first-person, second-person, third-person limited, third-person omniscient]"
     # )
