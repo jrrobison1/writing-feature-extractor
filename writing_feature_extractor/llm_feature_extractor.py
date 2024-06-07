@@ -19,6 +19,7 @@ from features.mood_feature import MoodFeature
 from features.mystery_level_feature import MysteryLevelFeature
 from features.emotional_intensity_feature import EmotionalIntensityFeature
 from features.pace_feature import PaceFeature
+from structures import Features
 
 
 logger = logging.getLogger(__name__)
@@ -57,37 +58,20 @@ def get_int_for_emotional_intensity(
 
 
 def get_number_for_pace(pace: PaceFeature.Pace):
-    # if pace == PaceFeature.Pace.VERY_SLOW:
-    #     return 1
-    if pace == PaceFeature.Pace.SLOW:
+    if pace == PaceFeature.Pace.VERY_SLOW:
         return 1
-    # if pace == PaceFeature.Pace.MEDIUM_SLOW:
-    #     return 3
-    if pace == PaceFeature.Pace.MEDIUM:
-        return 2
-    # if pace == PaceFeature.Pace.MEDIUM_FAST:
-    #     return 5
-    if pace == PaceFeature.Pace.FAST:
-        return 3
-    # if pace == PaceFeature.Pace.VERY_FAST:
-    #     return 7
-
-
-def get_number_for_mystery_level(pace: MysteryLevelFeature.MysteryLevel):
-    # if pace == PaceFeature.Pace.VERY_SLOW:
-    #     return 1
     if pace == PaceFeature.Pace.SLOW:
         return 2
-    # if pace == PaceFeature.Pace.MEDIUM_SLOW:
-    #     return 3
+    if pace == PaceFeature.Pace.MEDIUM_SLOW:
+        return 3
     if pace == PaceFeature.Pace.MEDIUM:
         return 4
-    # if pace == PaceFeature.Pace.MEDIUM_FAST:
-    #     return 5
+    if pace == PaceFeature.Pace.MEDIUM_FAST:
+        return 5
     if pace == PaceFeature.Pace.FAST:
-        return 6
-    # if pace == PaceFeature.Pace.VERY_FAST:
-    #     return 7
+        return 3
+    if pace == PaceFeature.Pace.VERY_FAST:
+        return 7
 
 
 mystery_level_feature = MysteryLevelFeature()
@@ -224,8 +208,8 @@ def extract_features(sections: list[str]):
             for pm in paragraph_metadata:
                 print(pm["pace"])
                 print(pm["mood"])
-                print(pm["emotional_intensity"])
-                print(pm["mystery_level"])
+                # print(pm["emotional_intensity"])
+                # print(pm["mystery_level"])
             paragraph_numbers = list(range(1, len(paragraphs) + 1))
 
             try:

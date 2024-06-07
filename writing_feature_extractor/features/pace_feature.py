@@ -8,13 +8,13 @@ class PaceFeature:
     class Pace(str, Enum):
         """Pace/speed of the narrative."""
 
-        # VERY_SLOW = "very slow"
+        VERY_SLOW = "very slow"
         SLOW = "slow"
-        # MEDIUM_SLOW = "medium slow"
+        MEDIUM_SLOW = "medium slow"
         MEDIUM = "medium"
-        # MEDIUM_FAST = "medium fast"
+        MEDIUM_FAST = "medium fast"
         FAST = "fast"
-        # VERY_FAST = "very fast"
+        VERY_FAST = "very fast"
 
     def get_graph_y_ticks(self):
         return [1, 2, 3]

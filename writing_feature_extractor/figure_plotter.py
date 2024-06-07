@@ -49,14 +49,13 @@ def get_graph(
 ):
 
     print(f"Length of paragraph_numbers: {len(paragraph_numbers)}")
-    print(f"Length of mystery_levels: {len(mystery_levels)}")
     data = {
         "Paragraph": paragraph_numbers,
         "Pacing": pace_numbers,
         "Text": paragraphs,
         "Mood": moods,
         "Emotional Intensity": emotional_intensities,
-        "Mystery Level": emotional_intensities,
+        "Mystery Level": mystery_levels,
     }
 
     # print(
@@ -95,16 +94,17 @@ def get_graph(
     ax.set_title("Pacing. Mood is indicated by color.")
     ax.set_xticks(center_positions)
     ax.set_xticklabels(df["Paragraph"], ha="right")
-    ax.set_yticks([1, 2, 3])
+    ax.set_yticks([1, 2, 3, 4, 5, 6, 7])
     ax.set_yticklabels(
         [
-            # "very low",
+            # "none",
+            "very low",
             "low",
-            # "medium low",
+            "medium low",
             "medium",
-            # "medium high",
+            "medium high",
             "high",
-            # "very high",
+            "very high",
         ]
     )
 
