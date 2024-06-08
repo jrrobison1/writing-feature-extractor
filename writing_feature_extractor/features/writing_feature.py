@@ -29,3 +29,7 @@ class WritingFeature(ABC):
     @abstractmethod
     def get_graph_colors(self) -> dict[str, str]:
         pass
+
+    @abstractmethod
+    def get_int_for_enum(self, typ: type) -> int:
+        pass

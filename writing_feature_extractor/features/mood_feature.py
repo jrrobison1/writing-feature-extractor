@@ -1,8 +1,9 @@
 from enum import Enum
-from langchain_core.pydantic_v1 import BaseModel, Field
+
+from features.writing_feature import WritingFeature
 
 
-class MoodFeature:
+class MoodFeature(WritingFeature):
 
     class Mood(str, Enum):
         """Mood of the text. The mood MUST be one of these selections. If the mood is not listed, choose the closest semantic match."""
@@ -30,3 +31,15 @@ class MoodFeature:
             "suspenseful": "#7328AA",
             "neutral": "#D3D3D3",
         }
+
+    def get_graph_y_tick_labels(self):
+        raise NotImplemented("MoodFeature is available only in colors")
+
+    def get_graph_y_ticks(self):
+        raise NotImplemented("MoodFeature is available only in colors")
+
+    def get_y_level_label(self):
+        raise NotImplemented("MoodFeature is available only in colors")
+
+    def get_int_for_enum(self, typ: type):
+        raise NotImplemented("MoodFeature is available only in colors")
