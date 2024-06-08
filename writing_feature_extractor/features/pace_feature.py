@@ -7,6 +7,8 @@ from features.writing_feature import WritingFeature
 
 class PaceFeature(WritingFeature):
 
+    results: list[int] = []
+
     class Pace(str, Enum):
         """Pace/speed of the narrative."""
 
@@ -62,3 +64,11 @@ class PaceFeature(WritingFeature):
             return 6
         if pace == PaceFeature.Pace.VERY_FAST:
             return 7
+
+    def add_result(self, enum_value):
+        # print(
+        #     f"Trying to convert to enum, enum_value: {enum_value}, type: {type(enum_value)}"
+        # )
+        # print(f"enum_value: {enum_value}")
+        # print(f"self.get_int_for_enum(enum_value): {self.get_int_for_enum(enum_value)}")
+        self.results.append(self.get_int_for_enum(enum_value))

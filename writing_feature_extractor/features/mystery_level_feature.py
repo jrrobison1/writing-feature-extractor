@@ -4,6 +4,8 @@ from langchain_core.pydantic_v1 import BaseModel, Field
 
 class MysteryLevelFeature:
 
+    results: list[int] = []
+
     class MysteryLevel(str, Enum):
         """Level of mystery in the text. Can be 'low', 'medium', 'high', or 'none'."""
 
@@ -41,3 +43,6 @@ class MysteryLevelFeature:
             return 2
         if mystery_level == MysteryLevelFeature.MysteryLevel.HIGH:
             return 3
+
+    def add_result(self, enum_value):
+        self.results.append(self.get_int_for_enum(enum_value))

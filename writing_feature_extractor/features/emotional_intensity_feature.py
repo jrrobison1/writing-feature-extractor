@@ -7,6 +7,8 @@ from features.writing_feature import WritingFeature
 
 class EmotionalIntensityFeature(WritingFeature):
 
+    results: list[int] = []
+
     class EmotionalIntensity(str, Enum):
         """Strength or intensity of emotions expressed in the text. Can be 'none', 'very low', 'low', 'medium low', 'medium', 'medium high', 'high', or 'very high'."""
 
@@ -75,3 +77,6 @@ class EmotionalIntensityFeature(WritingFeature):
             == EmotionalIntensityFeature.EmotionalIntensity.VERY_HIGH
         ):
             return 7
+
+    def add_result(self, enum_value):
+        self.results.append(self.get_int_for_enum(enum_value))

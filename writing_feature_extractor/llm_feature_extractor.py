@@ -23,6 +23,12 @@ from structures import Features
 
 from langchain_together import ChatTogether
 
+from features.writing_feature_factory import WritingFeatureFactory
+from features.available_writing_features import (
+    AvailableWritingFeatures,
+)
+from features.writing_feature import WritingFeature
+
 
 logger = logging.getLogger(__name__)
 
@@ -43,48 +49,6 @@ mood_feature = MoodFeature()
 pace_feature = PaceFeature()
 emotional_intensity_feature = EmotionalIntensityFeature()
 selected_features = dict()
-
-# Mystery Level Feature
-selected_features[mystery_level_feature.get_pydantic_feature_label()] = (
-    mystery_level_feature.get_pydantic_feature_type(),
-    Field(
-        ...,
-        description="Level of mystery in the text. Can be 'low', 'medium', 'high', or 'none'.",
-    ),
-)
-
-# Mood Feature
-selected_features[mood_feature.get_pydantic_feature_label()] = (
-    mood_feature.get_pydantic_feature_type(),
-    Field(
-        ...,
-        description="Mood of the text. The mood MUST be one of these selections. If the mood is not listed, choose the closest semantic match.",
-    ),
-)
-
-# Emotional Intensity Feature
-selected_features[emotional_intensity_feature.get_pydantic_feature_label()] = (
-    emotional_intensity_feature.get_pydantic_feature_type(),
-    Field(
-        ...,
-        description="Strength or intensity of emotions expressed in the text.",
-    ),
-)
-
-# Pace Feature
-selected_features[pace_feature.get_pydantic_feature_label()] = (
-    pace_feature.get_pydantic_feature_type(),
-    Field(
-        ...,
-        description="Pace/speed of the narrative. Can be 'very slow', 'slow', 'medium slow', 'medium', 'medium fast', 'fast', or 'very fast'.",
-    ),
-)
-
-DynamicFeatureModel = create_model(
-    "DynamicFeatureModel",
-    __doc__="Features contained in the creative writing text",
-    **selected_features,
-)
 
 
 def get_text_statistics(text: str) -> dict[str]:
@@ -112,6 +76,9 @@ def get_text_statistics(text: str) -> dict[str]:
 # llm = ChatOpenAI(model="gpt-4o", temperature=0).with_structured_output(
 #     DynamicFeatureModel
 # )
+feature_collectors, DynamicFeatureModel = WritingFeatureFactory.get_dynamic_model(
+    [AvailableWritingFeatures.PACING, AvailableWritingFeatures.MOOD]
+)
 llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0).with_structured_output(
     DynamicFeatureModel
 )
@@ -130,68 +97,55 @@ llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0).with_structured_output(
 # llm = ChatGroq(model_name="llama3-70b-8192", temperature=0).with_structured_output(
 #     Features
 # )
+def process_paragraph(paragraph: str, feature_collectors: list[WritingFeature]):
+    try:
+        result = llm.invoke(prompt_template.format(input=paragraph))
+        print(f"Result: [{str(result)}]")
+    except Exception as e:
+        logger.error(f"Exception is: [{e}]")
+
+    result_dict = result.dict()
+    result_dict["text_statistics"] = get_text_statistics(paragraph)
+
+    print(f"About to add results...")
+    for feature in feature_collectors:
+        print(
+            f"Adding result [{result_dict[feature.get_pydantic_feature_label()]}] for feature: [{feature.get_pydantic_feature_label()}]"
+        )
+        feature.add_result(result_dict[feature.get_pydantic_feature_label()])
+
+
+def process_section(section: str):
+
+    print(f"----------SECTION BEGIN----------")
+
+    for feature in feature_collectors:
+        feature.results.clear()
+    paragraphs = section.split("\n")
+    paragraphs = combine_short_strings(paragraphs)
+    for paragraph in paragraphs:
+        try:
+            process_paragraph(paragraph, feature_collectors)
+        except Exception as e:
+            logger.error(e)
+            continue
+
+    print(f"About to get graph...")
+    try:
+        get_graph(
+            feature_collectors,
+            paragraphs,
+        )
+    except Exception as e:
+        logger.error(e)
+
+    print(f"----------SECTION END----------\n\n")
 
 
 def extract_features(sections: list[str]):
     for section in sections:
         try:
-            print(f"----------SECTION BEGIN----------")
-            paragraph_metadata = []
-            this_paragraph_pace_data = []
-            this_paragraph_mood = []
-            # this_paragraph_suspense = []
-            this_paragraph_emotional_intensity = []
-            this_paragraph_mystery_level = []
-            paragraphs = section.split("\n")
-            for paragraph in paragraphs:
-                paragraphs = combine_short_strings(paragraphs)
-                try:
-                    try:
-                        result = llm.invoke(prompt_template.format(input=paragraph))
-                        print(f"Result: [{str(result)}]")
-                    except Exception as e:
-                        logger.error(f"Exception is: [{e}]")
-
-                    result_dict = result.dict()
-                    result_dict["text_statistics"] = get_text_statistics(paragraph)
-
-                    paragraph_metadata.append(result_dict)
-                    this_paragraph_mood.append(result_dict["mood"])
-                    this_paragraph_pace_data.append(
-                        PaceFeature().get_int_for_enum(result_dict["pace"])
-                    )
-                    this_paragraph_emotional_intensity.append(
-                        EmotionalIntensityFeature().get_int_for_enum(
-                            result_dict["emotional_intensity"]
-                        )
-                    )
-                    this_paragraph_mystery_level.append(
-                        MysteryLevelFeature().get_int_for_enum(
-                            result_dict["mystery_level"]
-                        )
-                    )
-                except Exception as e:
-                    logger.error(f"Second exception: [{e}]")
-                    continue
-
-            for pm in paragraph_metadata:
-                print(pm["pace"])
-                print(pm["mood"])
-                # print(pm["emotional_intensity"])
-                # print(pm["mystery_level"])
-
-            try:
-                get_graph(
-                    this_paragraph_pace_data,
-                    paragraphs,
-                    this_paragraph_mood,
-                    this_paragraph_emotional_intensity,
-                    this_paragraph_mystery_level,
-                )
-            except Exception as e:
-                logger.error(e)
-
-            print(f"----------SECTION END----------\n\n")
+            process_section(section)
         except Exception as e:
             logger.error(e)
             continue

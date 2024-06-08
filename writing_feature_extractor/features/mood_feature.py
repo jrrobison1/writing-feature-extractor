@@ -5,6 +5,8 @@ from features.writing_feature import WritingFeature
 
 class MoodFeature(WritingFeature):
 
+    results: list[int] = []
+
     class Mood(str, Enum):
         """Mood of the text. The mood MUST be one of these selections. If the mood is not listed, choose the closest semantic match."""
 
@@ -39,7 +41,11 @@ class MoodFeature(WritingFeature):
         raise NotImplemented("MoodFeature is available only in colors")
 
     def get_y_level_label(self):
-        raise NotImplemented("MoodFeature is available only in colors")
+        return "Mood"
 
     def get_int_for_enum(self, typ: type):
+        print(f"Trying to get int for {typ}")
         raise NotImplemented("MoodFeature is available only in colors")
+
+    def add_result(self, enum_value):
+        self.results.append(enum_value)

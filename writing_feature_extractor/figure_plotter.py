@@ -7,6 +7,7 @@ from features.mood_feature import MoodFeature
 from features.emotional_intensity_feature import (
     EmotionalIntensityFeature,
 )
+from features.writing_feature import WritingFeature
 
 logger = logging.getLogger(__name__)
 
@@ -17,21 +18,32 @@ colors = MoodFeature.get_graph_colors()
 
 
 def get_graph(
-    pace_numbers,
-    paragraphs,
-    moods,
-    emotional_intensities,
-    mystery_levels,
+    feature_collectors: list[WritingFeature],
+    # pace_numbers,
+    paragraphs: list[str],
+    # moods,
+    # emotional_intensities,
+    # mystery_levels,
 ):
+    print("Made it inside get_graph...")
     data = dict()
     data["Paragraph"] = list(range(1, len(paragraphs) + 1))
     data["Text"] = paragraphs
-    data["Pacing"] = pace_numbers
-    data["Mood"] = moods
-    data["Emotional Intensity"] = emotional_intensities
-    data["Mystery Level"] = mystery_levels
 
+    # print("Adding collector data to dict...")
+    for collector in feature_collectors:
+        data[collector.get_y_level_label()] = collector.results
+    # print(f"Data keys: {data.keys()}")
+    # print(f"Pace: {data['Pace']}")
+    # print(f"Mood: {data['Mood']}")
+    # data["Pacing"] = pace_numbers
+    # data["Mood"] = moods
+    # data["Emotional Intensity"] = emotional_intensities
+    # data["Mystery Level"] = mystery_levels
+
+    print("Creating DataFrame...")
     df = pd.DataFrame(data)
+    print(f"DataFrame created: {df}")
     df["Length"] = df["Text"].apply(lambda x: len(x.split()))
 
     max_width = 0.4
@@ -47,7 +59,7 @@ def get_graph(
 
     bars = ax.bar(
         positions,
-        df["Pacing"],
+        df["Pace"],
         width=df["Width"],
         color=[colors[mood] for mood in df["Mood"]],
         edgecolor="black",
@@ -56,8 +68,8 @@ def get_graph(
     )
 
     ax.set_xlabel("Paragraph")
-    ax.set_ylabel("Pacing")
-    ax.set_title("Pacing. Mood is indicated by color.")
+    ax.set_ylabel("Pace")
+    ax.set_title("Pace. Mood is indicated by color.")
     ax.set_xticks(center_positions)
     ax.set_xticklabels(df["Paragraph"], ha="right")
     ax.set_yticks([1, 2, 3, 4, 5, 6, 7])
