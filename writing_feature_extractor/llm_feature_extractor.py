@@ -71,7 +71,7 @@ def get_number_for_pace(pace: PaceFeature.Pace):
     if pace == PaceFeature.Pace.MEDIUM_FAST:
         return 5
     if pace == PaceFeature.Pace.FAST:
-        return 3
+        return 6
     if pace == PaceFeature.Pace.VERY_FAST:
         return 7
 
