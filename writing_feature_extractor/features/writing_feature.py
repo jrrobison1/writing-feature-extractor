@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+from features.writing_feature_graph_mode import WritingFeatureGraphMode
+
 
 class WritingFeature(ABC):
     @abstractmethod
@@ -36,4 +38,8 @@ class WritingFeature(ABC):
 
     @abstractmethod
     def add_result(self, enum_value):
+        pass
+
+    @abstractmethod
+    def set_graph_mode(self, graph_mode: WritingFeatureGraphMode):
         pass

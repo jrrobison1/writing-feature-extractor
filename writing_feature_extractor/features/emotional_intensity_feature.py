@@ -3,6 +3,7 @@ from enum import Enum
 from langchain_core.pydantic_v1 import BaseModel, Field
 
 from features.writing_feature import WritingFeature
+from features.writing_feature_graph_mode import WritingFeatureGraphMode
 
 
 class EmotionalIntensityFeature(WritingFeature):
@@ -80,3 +81,7 @@ class EmotionalIntensityFeature(WritingFeature):
 
     def add_result(self, enum_value):
         self.results.append(self.get_int_for_enum(enum_value))
+
+    def set_graph_mode(self, graph_mode: WritingFeatureGraphMode):
+        self.graph_mode = graph_mode
+        return self

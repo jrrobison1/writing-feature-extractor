@@ -1,6 +1,7 @@
 from enum import Enum
 
 from features.writing_feature import WritingFeature
+from features.writing_feature_graph_mode import WritingFeatureGraphMode
 
 
 class MoodFeature(WritingFeature):
@@ -49,3 +50,7 @@ class MoodFeature(WritingFeature):
 
     def add_result(self, enum_value):
         self.results.append(enum_value)
+
+    def set_graph_mode(self, graph_mode: WritingFeatureGraphMode):
+        self.graph_mode = graph_mode
+        return self
