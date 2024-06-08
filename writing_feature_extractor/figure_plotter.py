@@ -1,3 +1,4 @@
+import logging
 import pandas as pd
 import matplotlib.pyplot as plt
 import mplcursors
@@ -7,6 +8,8 @@ from features.emotional_intensity_feature import (
     EmotionalIntensityFeature,
 )
 
+logger = logging.getLogger(__name__)
+
 
 # Define mood colors (assuming this dictionary exists in your code)
 # mood to rgb mapping
@@ -14,27 +17,19 @@ colors = MoodFeature.get_graph_colors()
 
 
 def get_graph(
-    paragraph_numbers,
     pace_numbers,
     paragraphs,
     moods,
     emotional_intensities,
     mystery_levels,
 ):
-
-    print(f"Length of paragraph_numbers: {len(paragraph_numbers)}")
-    data = {
-        "Paragraph": paragraph_numbers,
-        "Pacing": pace_numbers,
-        "Text": paragraphs,
-        "Mood": moods,
-        "Emotional Intensity": emotional_intensities,
-        "Mystery Level": mystery_levels,
-    }
-
-    # print(
-    #     "emotional_intensities as seen by the figure plotter: ", emotional_intensities
-    # )
+    data = dict()
+    data["Paragraph"] = list(range(1, len(paragraphs) + 1))
+    data["Text"] = paragraphs
+    data["Pacing"] = pace_numbers
+    data["Mood"] = moods
+    data["Emotional Intensity"] = emotional_intensities
+    data["Mystery Level"] = mystery_levels
 
     df = pd.DataFrame(data)
     df["Length"] = df["Text"].apply(lambda x: len(x.split()))
@@ -50,8 +45,6 @@ def get_graph(
 
     fig, ax = plt.subplots(figsize=(10, 6))
 
-    # print(f"emotional_intensities in the dataframe: {df['Emotional Intensity']}")
-
     bars = ax.bar(
         positions,
         df["Pacing"],
@@ -62,7 +55,6 @@ def get_graph(
         hatch="//",
     )
 
-    print(f"Paragraphs: {df['Paragraph']}")
     ax.set_xlabel("Paragraph")
     ax.set_ylabel("Pacing")
     ax.set_title("Pacing. Mood is indicated by color.")
@@ -93,35 +85,3 @@ def get_graph(
         sel.annotation.set(text=f"Mood: {mood}", fontsize=10)
 
     plt.show()
-
-
-# Example usage (replace with actual data)
-# paragraph_numbers = [1, 2, 3, 4, 5, 6]
-# pace_numbers = [5, 3, 4, 2, 1, 3]
-# paragraphs = [
-#     "This is a test.",
-#     "Another paragraph.",
-#     "More text here.",
-#     "Really really really really really really long" "Yet another one.",
-#     "short",
-#     "Final paragraph.",
-# ]
-# moods = ["Happy", "Sad", "Angry", "Neutral", "Happy", "Happy"]
-# emotional_intensities = [
-#     EmotionalIntensityFeature.EmotionalIntensity.MEDIUM_LOW.value(),
-#     EmotionalIntensityFeature.EmotionalIntensity.VERY_LOW.value,
-#     EmotionalIntensityFeature.EmotionalIntensity.HIGH.value,
-#     EmotionalIntensityFeature.EmotionalIntensity.LOW.value,
-#     EmotionalIntensityFeature.EmotionalIntensity.MEDIUM_HIGH.value,
-#     EmotionalIntensityFeature.EmotionalIntensity.MEDIUM.value,
-# ]
-# mystery_levels = [2, 3, 1, 4, 5, 2]
-
-# get_graph(
-#     paragraph_numbers,
-#     pace_numbers,
-#     paragraphs,
-#     moods,
-#     emotional_intensities,
-#     mystery_levels,
-# )

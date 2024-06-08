@@ -32,8 +32,7 @@ class MysteryLevelFeature:
             "Level of mystery in the text. Can be 'low', 'medium', 'high', or 'none'."
         )
 
-    @staticmethod
-    def get_int_value_for_enum(mystery_level: MysteryLevel):
+    def get_int_for_enum(self, mystery_level: MysteryLevel):
         if mystery_level == MysteryLevelFeature.MysteryLevel.NONE:
             return 0
         if mystery_level == MysteryLevelFeature.MysteryLevel.LOW:

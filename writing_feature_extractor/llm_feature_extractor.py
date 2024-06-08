@@ -158,15 +158,15 @@ def extract_features(sections: list[str]):
                     paragraph_metadata.append(result_dict)
                     this_paragraph_mood.append(result_dict["mood"])
                     this_paragraph_pace_data.append(
-                        PaceFeature.get_int_for_enum(result_dict["pace"])
+                        PaceFeature().get_int_for_enum(result_dict["pace"])
                     )
                     this_paragraph_emotional_intensity.append(
-                        EmotionalIntensityFeature.get_int_for_enum(
+                        EmotionalIntensityFeature().get_int_for_enum(
                             result_dict["emotional_intensity"]
                         )
                     )
                     this_paragraph_mystery_level.append(
-                        MysteryLevelFeature.get_int_value_for_enum(
+                        MysteryLevelFeature().get_int_for_enum(
                             result_dict["mystery_level"]
                         )
                     )
@@ -179,11 +179,9 @@ def extract_features(sections: list[str]):
                 print(pm["mood"])
                 # print(pm["emotional_intensity"])
                 # print(pm["mystery_level"])
-            paragraph_numbers = list(range(1, len(paragraphs) + 1))
 
             try:
                 get_graph(
-                    paragraph_numbers,
                     this_paragraph_pace_data,
                     paragraphs,
                     this_paragraph_mood,

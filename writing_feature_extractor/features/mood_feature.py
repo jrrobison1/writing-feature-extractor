@@ -22,7 +22,6 @@ class MoodFeature:
     def get_pydantic_docstring(self):
         return "Mood of the text. The mood MUST be one of these selections. If the mood is not listed, choose the closest semantic match.."
 
-    @staticmethod
     def get_graph_colors():
         return {
             "positive": "#FFFF00",

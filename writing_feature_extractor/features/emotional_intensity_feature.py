@@ -1,8 +1,11 @@
+from abc import abstractmethod
 from enum import Enum
 from langchain_core.pydantic_v1 import BaseModel, Field
 
+from features.writing_feature import WritingFeature
 
-class EmotionalIntensityFeature:
+
+class EmotionalIntensityFeature(WritingFeature):
 
     class EmotionalIntensity(str, Enum):
         """Strength or intensity of emotions expressed in the text. Can be 'none', 'very low', 'low', 'medium low', 'medium', 'medium high', 'high', or 'very high'."""
@@ -43,8 +46,10 @@ class EmotionalIntensityFeature:
     def get_pydantic_docstring(self):
         return "Strength or intensity of emotions expressed in the text"
 
-    @staticmethod
-    def get_int_for_enum(emotional_intensity: EmotionalIntensity):
+    def get_graph_colors(self) -> dict[str, str]:
+        raise NotImplemented("EmotionalIntensityFeature does not have graph colors")
+
+    def get_int_for_enum(self, emotional_intensity: EmotionalIntensity):
         if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.NONE:
             return 0
         if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.VERY_LOW:
