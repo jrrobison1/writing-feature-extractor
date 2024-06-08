@@ -38,44 +38,6 @@ logging.getLogger(__name__).setLevel(logging.INFO)
 SECTION_DELIMETER = "***"
 
 
-def get_int_for_emotional_intensity(
-    emotional_intensity: EmotionalIntensityFeature.EmotionalIntensity,
-):
-    if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.NONE:
-        return 0
-    if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.VERY_LOW:
-        return 1
-    if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.LOW:
-        return 2
-    if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.MEDIUM_LOW:
-        return 3
-    if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.MEDIUM:
-        return 4
-    if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.MEDIUM_HIGH:
-        return 5
-    if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.HIGH:
-        return 6
-    if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.VERY_HIGH:
-        return 7
-
-
-def get_number_for_pace(pace: PaceFeature.Pace):
-    if pace == PaceFeature.Pace.VERY_SLOW:
-        return 1
-    if pace == PaceFeature.Pace.SLOW:
-        return 2
-    if pace == PaceFeature.Pace.MEDIUM_SLOW:
-        return 3
-    if pace == PaceFeature.Pace.MEDIUM:
-        return 4
-    if pace == PaceFeature.Pace.MEDIUM_FAST:
-        return 5
-    if pace == PaceFeature.Pace.FAST:
-        return 6
-    if pace == PaceFeature.Pace.VERY_FAST:
-        return 7
-
-
 mystery_level_feature = MysteryLevelFeature()
 mood_feature = MoodFeature()
 pace_feature = PaceFeature()
@@ -196,10 +158,10 @@ def extract_features(sections: list[str]):
                     paragraph_metadata.append(result_dict)
                     this_paragraph_mood.append(result_dict["mood"])
                     this_paragraph_pace_data.append(
-                        get_number_for_pace(result_dict["pace"])
+                        PaceFeature.get_int_for_enum(result_dict["pace"])
                     )
                     this_paragraph_emotional_intensity.append(
-                        get_int_for_emotional_intensity(
+                        EmotionalIntensityFeature.get_int_for_enum(
                             result_dict["emotional_intensity"]
                         )
                     )

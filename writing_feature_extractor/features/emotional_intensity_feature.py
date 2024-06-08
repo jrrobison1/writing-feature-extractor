@@ -42,3 +42,31 @@ class EmotionalIntensityFeature:
 
     def get_pydantic_docstring(self):
         return "Strength or intensity of emotions expressed in the text"
+
+    @staticmethod
+    def get_int_for_enum(emotional_intensity: EmotionalIntensity):
+        if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.NONE:
+            return 0
+        if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.VERY_LOW:
+            return 1
+        if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.LOW:
+            return 2
+        if (
+            emotional_intensity
+            == EmotionalIntensityFeature.EmotionalIntensity.MEDIUM_LOW
+        ):
+            return 3
+        if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.MEDIUM:
+            return 4
+        if (
+            emotional_intensity
+            == EmotionalIntensityFeature.EmotionalIntensity.MEDIUM_HIGH
+        ):
+            return 5
+        if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.HIGH:
+            return 6
+        if (
+            emotional_intensity
+            == EmotionalIntensityFeature.EmotionalIntensity.VERY_HIGH
+        ):
+            return 7

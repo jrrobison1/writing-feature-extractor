@@ -33,3 +33,20 @@ class PaceFeature:
 
     def get_pydantic_docstring(self):
         return "Pace/speed of the narrative."
+
+    @staticmethod
+    def get_int_for_enum(pace: Pace):
+        if pace == PaceFeature.Pace.VERY_SLOW:
+            return 1
+        if pace == PaceFeature.Pace.SLOW:
+            return 2
+        if pace == PaceFeature.Pace.MEDIUM_SLOW:
+            return 3
+        if pace == PaceFeature.Pace.MEDIUM:
+            return 4
+        if pace == PaceFeature.Pace.MEDIUM_FAST:
+            return 5
+        if pace == PaceFeature.Pace.FAST:
+            return 6
+        if pace == PaceFeature.Pace.VERY_FAST:
+            return 7

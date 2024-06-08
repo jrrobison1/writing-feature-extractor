@@ -1,42 +1,16 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import mplcursors
+from features.mood_feature import MoodFeature
 
 from features.emotional_intensity_feature import (
     EmotionalIntensityFeature,
 )
 
 
-def get_int_for_emotional_intensity(
-    emotional_intensity: EmotionalIntensityFeature.EmotionalIntensity,
-):
-    if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.NONE:
-        return 0
-    if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.VERY_LOW:
-        return 1
-    if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.LOW:
-        return 2
-    if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.MEDIUM_LOW:
-        return 3
-    if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.MEDIUM:
-        return 4
-    if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.MEDIUM_HIGH:
-        return 5
-    if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.HIGH:
-        return 6
-    if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.VERY_HIGH:
-        return 7
-
-
 # Define mood colors (assuming this dictionary exists in your code)
 # mood to rgb mapping
-mood_colors = {
-    "positive": "#FFFF00",
-    "sad": "#00008B",
-    "angry": "#FF0000",
-    "suspenseful": "#7328AA",
-    "neutral": "#D3D3D3",
-}
+colors = MoodFeature.get_graph_colors()
 
 
 def get_graph(
@@ -82,7 +56,7 @@ def get_graph(
         positions,
         df["Pacing"],
         width=df["Width"],
-        color=[mood_colors[mood] for mood in df["Mood"]],
+        color=[colors[mood] for mood in df["Mood"]],
         edgecolor="black",
         align="edge",
         hatch="//",
