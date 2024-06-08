@@ -29,7 +29,7 @@ class PaceFeature:
         return "pace"
 
     def get_pydantic_feature_type(self):
-        return Optional[PaceFeature.Pace]
+        return PaceFeature.Pace
 
     def get_pydantic_docstring(self):
         return "Pace/speed of the narrative."

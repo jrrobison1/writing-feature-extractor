@@ -21,6 +21,8 @@ from features.emotional_intensity_feature import EmotionalIntensityFeature
 from features.pace_feature import PaceFeature
 from structures import Features
 
+from langchain_together import ChatTogether
+
 
 logger = logging.getLogger(__name__)
 
@@ -138,31 +140,36 @@ def get_text_statistics(text: str) -> dict[str]:
 
 # llm = ChatAnthropic(
 #     model="claude-3-opus-20240229", temperature=0
-# ).with_structured_output(Features)
+# ).with_structured_output(DynamicFeatureModel)
 # llm = ChatAnthropic(model_name="claude-3-sonnet-20240229", temperature=0).with_structured_output(Features)
 # llm = ChatAnthropic(
 #     model_name="claude-3-haiku-20240307", temperature=0
 # ).with_structured_output(Features)
 # llm = ChatVertexAI(model="gemini-1.5-pro-latest", temperature=0).with_structured_output(Features)
 # llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro-latest", temperature=0)
-llm = ChatOpenAI(model="gpt-4o", temperature=0).with_structured_output(
-    DynamicFeatureModel
-)
-# llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0).with_structured_output(
+# llm = ChatOpenAI(model="gpt-4o", temperature=0).with_structured_output(
 #     DynamicFeatureModel
 # )
+llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0).with_structured_output(
+    DynamicFeatureModel
+)
 
 
 # Together.ai
+# ChatTogether(model="meta-llama/Llama-3-70b-chat-hf")
 # llm = ChatOpenAI(
 #     base_url="https://api.together.xyz/v1",
 #     api_key="8ad294d976b5b5eb6d0e65c27b6b793db049edc05e79ae21ad4011ba78001d41",
-#     model="meta-llama/Llama-3-8b-hf",
+#     model="meta-llama/Llama-3-70b-chat-hf",
 #     temperature=0,
-# )
-# llm = ChatGroq(model_name="llama3-8b-8192", temperature=0).with_structured_output(
+# ).with_structured_output(DynamicFeatureModel)
+
+
+# llm = ChatGroq(model_name="llama3-70b-8192", temperature=0).with_structured_output(
 #     Features
 # )
+
+
 def extract_features(sections: list[str]):
     for section in sections:
         try:
@@ -184,7 +191,7 @@ def extract_features(sections: list[str]):
                         logger.error(f"Exception is: [{e}]")
 
                     result_dict = result.dict()
-                    # result_dict["text_statistics"] = get_text_statistics(paragraph)
+                    result_dict["text_statistics"] = get_text_statistics(paragraph)
 
                     paragraph_metadata.append(result_dict)
                     this_paragraph_mood.append(result_dict["mood"])
