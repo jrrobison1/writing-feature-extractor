@@ -1,13 +1,6 @@
 import logging
 import sys
 
-
-from langchain_groq import ChatGroq
-from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_google_vertexai import ChatVertexAI
-from langchain_anthropic import ChatAnthropic
-from langchain_openai import ChatOpenAI
-
 from prompt_templates.basic_prompt import prompt_template
 from utils.text_metrics import get_text_statistics
 from utils.text_metrics import combine_short_strings
@@ -19,6 +12,8 @@ from features.available_writing_features import (
     AvailableWritingFeatures,
 )
 from features.writing_feature import WritingFeature
+from model_factory import ModelFactory
+from available_models import AvailableModels
 
 
 logger = logging.getLogger(__name__)
@@ -34,27 +29,10 @@ logging.getLogger(__name__).setLevel(logging.INFO)
 
 SECTION_DELIMETER = "***"
 
-
-# llm = ChatAnthropic(
-#     model="claude-3-opus-20240229", temperature=0
-# ).with_structured_output(DynamicFeatureModel)
-# llm = ChatAnthropic(model_name="claude-3-sonnet-20240229", temperature=0).with_structured_output(Features)
-# llm = ChatAnthropic(
-#     model_name="claude-3-haiku-20240307", temperature=0
-# ).with_structured_output(Features)
-# llm = ChatGoogleGenerativeAI(model="gemini-1.5-pro-latest", temperature=0)
-# llm = ChatOpenAI(model="gpt-4o", temperature=0).with_structured_output(
-#     DynamicFeatureModel
-# )
-# llm = ChatGroq(model_name="llama3-70b-8192", temperature=0).with_structured_output(
-#     Features
-# )
 feature_collectors, DynamicFeatureModel = WritingFeatureFactory.get_dynamic_model(
     [AvailableWritingFeatures.PACING, AvailableWritingFeatures.MOOD]
 )
-llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0).with_structured_output(
-    DynamicFeatureModel
-)
+llm = ModelFactory.get_llm_model(AvailableModels.GPT_3_5, DynamicFeatureModel)
 
 
 def process_paragraph(paragraph: str, feature_collectors: list[WritingFeature]):
