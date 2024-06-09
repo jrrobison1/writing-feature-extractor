@@ -9,6 +9,7 @@ from features.writing_feature_graph_mode import WritingFeatureGraphMode
 class PaceFeature(WritingFeature):
 
     results: list[int] = []
+    graph_mode = WritingFeatureGraphMode.BAR
 
     class Pace(str, Enum):
         """Pace/speed of the narrative."""

@@ -7,6 +7,7 @@ from features.writing_feature_graph_mode import WritingFeatureGraphMode
 class MoodFeature(WritingFeature):
 
     results: list[int] = []
+    graph_mode = WritingFeatureGraphMode.COLOR
 
     class Mood(str, Enum):
         """Mood of the text. The mood MUST be one of these selections. If the mood is not listed, choose the closest semantic match."""
@@ -26,7 +27,7 @@ class MoodFeature(WritingFeature):
     def get_pydantic_docstring(self):
         return "Mood of the text. The mood MUST be one of these selections. If the mood is not listed, choose the closest semantic match.."
 
-    def get_graph_colors():
+    def get_graph_colors(self):
         return {
             "positive": "#FFFF00",
             "sad": "#00008B",

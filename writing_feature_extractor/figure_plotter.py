@@ -1,51 +1,63 @@
 import logging
+from typing import Tuple
 import pandas as pd
 import matplotlib.pyplot as plt
 import mplcursors
-from features.mood_feature import MoodFeature
 
-from features.emotional_intensity_feature import (
-    EmotionalIntensityFeature,
-)
 from features.writing_feature import WritingFeature
+from features.writing_feature_graph_mode import (
+    WritingFeatureGraphMode,
+)
 
 logger = logging.getLogger(__name__)
 
 
-# Define mood colors (assuming this dictionary exists in your code)
-# mood to rgb mapping
-colors = MoodFeature.get_graph_colors()
+def bar_and_color_features(
+    feature_collectors: list[WritingFeature],
+) -> Tuple[WritingFeature, WritingFeature]:
+    # Validate that there is exactly one feature collector with a graph type of WritingFeatureGraphMode.BAR, and exactly one with WritingFeatureGraphMode.COLOR
+    bar_count = 0
+    color_count = 0
+    bar_feature = None
+    color_feature = None
+    for collector in feature_collectors:
+        if collector.graph_mode == WritingFeatureGraphMode.BAR:
+            bar_count += 1
+            bar_feature = collector
+        elif collector.graph_mode == WritingFeatureGraphMode.COLOR:
+            color_count += 1
+            color_feature = collector
+    if bar_count != 1:
+        raise ValueError(
+            "There must be exactly one feature collector with a graph type of WritingFeatureGraphMode.BAR"
+        )
+    if color_count != 1:
+        raise ValueError(
+            "There must be exactly one feature collector with a graph type of WritingFeatureGraphMode.COLOR"
+        )
+    return bar_feature, color_feature
 
 
 def get_graph(
     feature_collectors: list[WritingFeature],
-    # pace_numbers,
     paragraphs: list[str],
-    # moods,
-    # emotional_intensities,
-    # mystery_levels,
 ):
-    print("Made it inside get_graph...")
+    bar_feature, color_feature = bar_and_color_features(feature_collectors)
+    logger.info(f"Bar feature: {bar_feature}")
+    logger.info(f"Color feature: {color_feature}")
+    colors = color_feature.get_graph_colors()
+
+    # Create the dataframe
     data = dict()
     data["Paragraph"] = list(range(1, len(paragraphs) + 1))
     data["Text"] = paragraphs
 
-    # print("Adding collector data to dict...")
     for collector in feature_collectors:
         data[collector.get_y_level_label()] = collector.results
-    # print(f"Data keys: {data.keys()}")
-    # print(f"Pace: {data['Pace']}")
-    # print(f"Mood: {data['Mood']}")
-    # data["Pacing"] = pace_numbers
-    # data["Mood"] = moods
-    # data["Emotional Intensity"] = emotional_intensities
-    # data["Mystery Level"] = mystery_levels
-
-    print("Creating DataFrame...")
     df = pd.DataFrame(data)
-    print(f"DataFrame created: {df}")
-    df["Length"] = df["Text"].apply(lambda x: len(x.split()))
 
+    # Adjust widths of bars to be proportional to the number of words in the paragraph
+    df["Length"] = df["Text"].apply(lambda x: len(x.split()))
     max_width = 0.4
     min_width = 0.1
     df["Width"] = (
@@ -59,32 +71,23 @@ def get_graph(
 
     bars = ax.bar(
         positions,
-        df["Pace"],
+        df[bar_feature.get_y_level_label()],
         width=df["Width"],
-        color=[colors[mood] for mood in df["Mood"]],
+        color=[colors[feature] for feature in df[color_feature.get_y_level_label()]],
         edgecolor="black",
         align="edge",
         hatch="//",
     )
 
     ax.set_xlabel("Paragraph")
-    ax.set_ylabel("Pace")
-    ax.set_title("Pace. Mood is indicated by color.")
+    ax.set_ylabel(bar_feature.get_y_level_label())
+
+    title = f"{bar_feature.get_y_level_label()}. {color_feature.get_y_level_label()} is indicated by color."
+    ax.set_title(title)
     ax.set_xticks(center_positions)
     ax.set_xticklabels(df["Paragraph"], ha="right")
-    ax.set_yticks([1, 2, 3, 4, 5, 6, 7])
-    ax.set_yticklabels(
-        [
-            # "none",
-            "very low",
-            "low",
-            "medium low",
-            "medium",
-            "medium high",
-            "high",
-            "very high",
-        ]
-    )
+    ax.set_yticks(bar_feature.get_graph_y_ticks())
+    ax.set_yticklabels(bar_feature.get_graph_y_tick_labels())
 
     ax.yaxis.grid(False)
 
@@ -93,7 +96,9 @@ def get_graph(
     @cursor.connect("add")
     def on_add(sel):
         index = sel.index
-        mood = df.iloc[index]["Mood"]
-        sel.annotation.set(text=f"Mood: {mood}", fontsize=10)
+        color_annotation = df.iloc[index][color_feature.get_y_level_label()]
+        sel.annotation.set(
+            text=f"{color_feature.get_y_level_label()}: {color_annotation}", fontsize=10
+        )
 
     plt.show()
