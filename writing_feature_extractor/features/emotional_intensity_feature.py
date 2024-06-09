@@ -7,6 +7,12 @@ from features.writing_feature_graph_mode import WritingFeatureGraphMode
 
 
 class EmotionalIntensityFeature(WritingFeature):
+    """Feature extractor for the emotional intensity of the text."""
+
+    def __init__(
+        self, graph_mode: WritingFeatureGraphMode = WritingFeatureGraphMode.BAR
+    ):
+        self.graph_mode = graph_mode
 
     results: list[int] = []
 

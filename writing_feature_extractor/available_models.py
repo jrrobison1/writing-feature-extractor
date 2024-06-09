@@ -2,6 +2,8 @@ from enum import Enum
 
 
 class AvailableModels(str, Enum):
+    """Available llm models for text generation."""
+
     GPT_3_5 = "gpt-3.5-turbo"
     GPT_4o = "gpt-4o"
     LLAMA3_70B = "llama3-70b-8192"

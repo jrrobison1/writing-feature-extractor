@@ -21,7 +21,8 @@ logger = logging.getLogger(__name__)
 # Configure logging
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    # format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    format="%(levelname)s - %(message)s",
     handlers=[logging.FileHandler("app.log"), logging.StreamHandler(sys.stdout)],
 )
 logging.getLogger(__name__).setLevel(logging.INFO)
@@ -36,6 +37,8 @@ llm = ModelFactory.get_llm_model(AvailableModels.GPT_3_5, DynamicFeatureModel)
 
 
 def process_paragraph(paragraph: str, feature_collectors: list[WritingFeature]):
+    """Run LLM on a paragraph to perform feature extraction"""
+
     try:
         result = llm.invoke(prompt_template.format(input=paragraph))
         logger.info(f"Result: [{str(result)}]")
@@ -53,6 +56,9 @@ def process_paragraph(paragraph: str, feature_collectors: list[WritingFeature]):
 
 
 def process_section(section: str):
+    """Process a 'section' of text. A section of text is expected to be broken up into
+    smaller chunks separated by newlines ('paragraphs')"""
+
     print(f"----------SECTION BEGIN----------")
 
     for feature in feature_collectors:
@@ -78,6 +84,8 @@ def process_section(section: str):
 
 
 def extract_features(sections: list[str]):
+    """Extract features from the text and display them in a graph."""
+
     for section in sections:
         try:
             process_section(section)

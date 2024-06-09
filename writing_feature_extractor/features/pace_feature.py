@@ -7,9 +7,14 @@ from features.writing_feature_graph_mode import WritingFeatureGraphMode
 
 
 class PaceFeature(WritingFeature):
+    """Feature extractor for the pace of the narrative."""
+
+    def __init__(
+        self, graph_mode: WritingFeatureGraphMode = WritingFeatureGraphMode.BAR
+    ):
+        self.graph_mode = graph_mode
 
     results: list[int] = []
-    graph_mode = WritingFeatureGraphMode.BAR
 
     class Pace(str, Enum):
         """Pace/speed of the narrative."""

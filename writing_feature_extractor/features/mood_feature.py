@@ -5,9 +5,14 @@ from features.writing_feature_graph_mode import WritingFeatureGraphMode
 
 
 class MoodFeature(WritingFeature):
+    """Feature extractor for the mood of the text."""
+
+    def __init__(
+        self, graph_mode: WritingFeatureGraphMode = WritingFeatureGraphMode.COLOR
+    ):
+        self.graph_mode = graph_mode
 
     results: list[int] = []
-    graph_mode = WritingFeatureGraphMode.COLOR
 
     class Mood(str, Enum):
         """Mood of the text. The mood MUST be one of these selections. If the mood is not listed, choose the closest semantic match."""

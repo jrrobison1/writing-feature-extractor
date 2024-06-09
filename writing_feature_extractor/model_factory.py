@@ -9,8 +9,13 @@ from available_models import AvailableModels
 
 
 class ModelFactory:
+    """Factory for creating instances of large language models"""
+
     @staticmethod
     def get_llm_model(model: AvailableModels, PydanticModel: type[BaseModel]):
+        """Get a language model based on the model type and a pydantic model representing
+        the structured output of the model."""
+
         if model == AvailableModels.GPT_3_5:
             return ChatOpenAI(
                 model="gpt-3.5-turbo", temperature=0

@@ -12,10 +12,15 @@ from langchain_core.pydantic_v1 import Field, BaseModel, create_model
 
 
 class WritingFeatureFactory:
+    """Factory class to create dynamic pydantic models based on the given
+    writing features desired for feature extraction."""
+
     @staticmethod
     def get_dynamic_model(
         features: list[AvailableWritingFeatures],
     ) -> Tuple[type[BaseModel], list[WritingFeature]]:
+        """Creates a dynamic pydantic model based on the given writing features"""
+
         selected_features = dict()
         feature_collectors = []
         for feature in features:

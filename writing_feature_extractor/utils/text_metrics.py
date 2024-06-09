@@ -3,19 +3,12 @@ import textstat
 
 
 def calculate_dialogue_percentage(text):
-    # Define a regex pattern to match dialogue enclosed in double quotation marks, including newlines
+    """Calculate the percentage of text that is within dialogue tags"""
+
     dialogue_pattern = r'"[^"]*"'
-
-    # Find all matches of the dialogue pattern in the text using re.DOTALL flag
     dialogues = re.findall(dialogue_pattern, text, re.DOTALL)
-
-    # Calculate the total length of the dialogues
     dialogue_length = sum(len(dialogue) for dialogue in dialogues)
-
-    # Calculate the total length of the text
     total_length = len(text)
-
-    # Calculate the percentage of text that is within dialogue tags
     dialogue_percentage = (
         (dialogue_length / total_length) * 100 if total_length > 0 else 0
     )
@@ -24,6 +17,10 @@ def calculate_dialogue_percentage(text):
 
 
 def combine_short_strings(strings: list[str], minimum_words=5) -> list[str]:
+    """Combine short strings (less than minimum_words) with the next string in the list.
+    This is useful for pieces of text that are too small for an LLM to make inference
+    for feature extraction"""
+
     i = 0
     while i < len(strings) - 1:
         if (len(strings[i].split()) < minimum_words) and (len(strings[i]) > 0):
@@ -36,6 +33,8 @@ def combine_short_strings(strings: list[str], minimum_words=5) -> list[str]:
 
 
 def get_text_statistics(text: str) -> dict[str]:
+    """Get statistics about the text, such as readability"""
+
     text_statistics = dict()
     dialogue_percentage = calculate_dialogue_percentage(text)
     dp_as_string = f"{dialogue_percentage:.2f}%"

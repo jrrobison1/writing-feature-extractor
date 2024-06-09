@@ -5,9 +5,14 @@ from features.writing_feature_graph_mode import WritingFeatureGraphMode
 
 
 class MysteryLevelFeature:
+    """Feature extractor for the level of mystery in the text."""
+
+    def __init__(
+        self, graph_mode: WritingFeatureGraphMode = WritingFeatureGraphMode.BAR
+    ):
+        self.graph_mode = graph_mode
 
     results: list[int] = []
-    graph_mode = WritingFeatureGraphMode.BAR
 
     class MysteryLevel(str, Enum):
         """Level of mystery in the text. Can be 'low', 'medium', 'high', or 'none'."""

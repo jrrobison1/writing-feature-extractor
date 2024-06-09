@@ -15,6 +15,8 @@ logger = logging.getLogger(__name__)
 def bar_and_color_features(
     feature_collectors: list[WritingFeature],
 ) -> Tuple[WritingFeature, WritingFeature]:
+    """Get the feature collectors that have been marked as 'bar' and 'color'"""
+
     # Validate that there is exactly one feature collector with a graph type of WritingFeatureGraphMode.BAR, and exactly one with WritingFeatureGraphMode.COLOR
     bar_count = 0
     color_count = 0
@@ -42,6 +44,8 @@ def get_graph(
     feature_collectors: list[WritingFeature],
     paragraphs: list[str],
 ):
+    """Create and display a graph based on data extracted from the text"""
+
     bar_feature, color_feature = bar_and_color_features(feature_collectors)
     logger.info(f"Bar feature: {bar_feature}")
     logger.info(f"Color feature: {color_feature}")

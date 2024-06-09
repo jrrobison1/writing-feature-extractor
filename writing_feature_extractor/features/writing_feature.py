@@ -4,6 +4,9 @@ from features.writing_feature_graph_mode import WritingFeatureGraphMode
 
 
 class WritingFeature(ABC):
+    """Abstract base class for a 'writing feature': a feature which can be
+    extracted by an LLM and be presented in a graph."""
+
     @abstractmethod
     def get_graph_y_ticks(self) -> list[int]:
         pass
