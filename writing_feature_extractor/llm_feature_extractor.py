@@ -1,5 +1,6 @@
-import logging
 import sys
+import traceback
+from logger_config import logger
 
 from prompt_templates.basic_prompt import prompt_template
 from utils.text_metrics import get_text_statistics
@@ -17,18 +18,6 @@ from available_models import AvailableModels
 from features.writing_feature_graph_mode import (
     WritingFeatureGraphMode,
 )
-
-
-logger = logging.getLogger(__name__)
-
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    # format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-    format="%(levelname)s - %(message)s",
-    handlers=[logging.FileHandler("app.log"), logging.StreamHandler(sys.stdout)],
-)
-logging.getLogger(__name__).setLevel(logging.INFO)
 
 
 SECTION_DELIMETER = "***"
@@ -50,9 +39,10 @@ def process_paragraph(paragraph: str, feature_collectors: list[WritingFeature]):
 
     try:
         result = llm.invoke(prompt_template.format(input=paragraph))
-        logger.info(f"Result: [{str(result)}]")
+        logger.info(f"LLM Result: [{str(result)}]")
     except Exception as e:
-        logger.error(f"Exception is: [{e}]")
+        logger.error("Error invoking the LLM", e)
+        logger.error(traceback.format_exc())
 
     result_dict = result.dict()
     result_dict["text_statistics"] = get_text_statistics(paragraph)
@@ -78,7 +68,8 @@ def process_section(section: str):
         try:
             process_paragraph(paragraph, feature_collectors)
         except Exception as e:
-            logger.error(e)
+            logger.error("Error processing paragraph", e)
+            logger.error(traceback.format_exc())
             continue
 
     try:
@@ -87,7 +78,8 @@ def process_section(section: str):
             paragraphs,
         )
     except Exception as e:
-        logger.error(e)
+        logger.error("Error generating graph", e)
+        logger.error(traceback.format_exc())
 
     print(f"----------SECTION END----------\n\n")
 

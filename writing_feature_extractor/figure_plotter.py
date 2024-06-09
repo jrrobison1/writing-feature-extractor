@@ -1,4 +1,4 @@
-import logging
+from logger_config import logger
 from typing import Tuple
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -8,8 +8,6 @@ from features.writing_feature import WritingFeature
 from features.writing_feature_graph_mode import (
     WritingFeatureGraphMode,
 )
-
-logger = logging.getLogger(__name__)
 
 
 def bar_and_color_features(
@@ -47,8 +45,8 @@ def get_graph(
     """Create and display a graph based on data extracted from the text"""
 
     bar_feature, color_feature = bar_and_color_features(feature_collectors)
-    logger.info(f"Bar feature: {bar_feature}")
-    logger.info(f"Color feature: {color_feature}")
+    logger.info(f"Bar feature: {type(bar_feature)}")
+    logger.info(f"Color feature: {type(color_feature)}")
     colors = color_feature.get_graph_colors()
 
     # Create the dataframe
