@@ -8,8 +8,8 @@ logger.setLevel(logging.INFO)
 
 # Create handlers
 file_handler = RotatingFileHandler(
-    "app.log", maxBytes=1024 * 1024, backupCount=5
-)  # 1MB per file, keep 5 backups
+    "llm_feature_extractor.log", maxBytes=1024 * 1024, backupCount=1
+)  # 1MB per file, keep 1 backup
 stream_handler = logging.StreamHandler(sys.stdout)
 
 # Set logging levels for handlers
