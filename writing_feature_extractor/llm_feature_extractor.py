@@ -15,8 +15,8 @@ from features.available_writing_features import (
 from features.writing_feature import WritingFeature
 from model_factory import ModelFactory
 from available_models import AvailableModels
-from features.writing_feature_graph_mode import (
-    WritingFeatureGraphMode,
+from features.graph_mode import (
+    GraphMode,
 )
 
 
@@ -25,13 +25,14 @@ SECTION_DELIMETER = "***"
 feature_collectors, DynamicFeatureModel = WritingFeatureFactory.get_dynamic_model(
     [
         (
-            AvailableWritingFeatures.DESCRIPTIVE_DETAIL_LEVEL,
-            WritingFeatureGraphMode.BAR,
+            AvailableWritingFeatures.EMOTIONAL_INTENSITY,
+            GraphMode.BAR,
         ),
-        (AvailableWritingFeatures.ROMANCE_LEVEL, WritingFeatureGraphMode.COLOR),
+        (AvailableWritingFeatures.MYSTERY_LEVEL, GraphMode.COLOR),
     ]
 )
 llm = ModelFactory.get_llm_model(AvailableModels.GPT_3_5, DynamicFeatureModel)
+logger.debug(f"Obtained LLM model: {llm}")
 
 
 def process_paragraph(paragraph: str, feature_collectors: list[WritingFeature]):

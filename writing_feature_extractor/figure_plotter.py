@@ -5,8 +5,8 @@ import matplotlib.pyplot as plt
 import mplcursors
 
 from features.writing_feature import WritingFeature
-from features.writing_feature_graph_mode import (
-    WritingFeatureGraphMode,
+from features.graph_mode import (
+    GraphMode,
 )
 
 
@@ -15,16 +15,18 @@ def bar_and_color_features(
 ) -> Tuple[WritingFeature, WritingFeature]:
     """Get the feature collectors that have been marked as 'bar' and 'color'"""
 
+    logger.debug(["Collectors: {f.__class__.__name__}" for f in feature_collectors])
+
     # Validate that there is exactly one feature collector with a graph type of WritingFeatureGraphMode.BAR, and exactly one with WritingFeatureGraphMode.COLOR
     bar_count = 0
     color_count = 0
     bar_feature = None
     color_feature = None
     for collector in feature_collectors:
-        if collector.graph_mode == WritingFeatureGraphMode.BAR:
+        if collector.graph_mode == GraphMode.BAR:
             bar_count += 1
             bar_feature = collector
-        elif collector.graph_mode == WritingFeatureGraphMode.COLOR:
+        elif collector.graph_mode == GraphMode.COLOR:
             color_count += 1
             color_feature = collector
     if bar_count != 1:
@@ -45,8 +47,8 @@ def get_graph(
     """Create and display a graph based on data extracted from the text"""
 
     bar_feature, color_feature = bar_and_color_features(feature_collectors)
-    logger.info(f"Bar feature: {type(bar_feature)}")
-    logger.info(f"Color feature: {type(color_feature)}")
+    logger.info(f"Bar feature: {bar_feature.__class__.__name__}")
+    logger.info(f"Color feature: {color_feature.__class__.__name__}")
     colors = color_feature.get_graph_colors()
 
     # Create the dataframe
@@ -57,6 +59,7 @@ def get_graph(
     for collector in feature_collectors:
         data[collector.get_y_level_label()] = collector.results
     df = pd.DataFrame(data)
+    logger.debug(f"Dataframe:\n {df}")
 
     # Adjust widths of bars to be proportional to the number of words in the paragraph
     df["Length"] = df["Text"].apply(lambda x: len(x.split()))

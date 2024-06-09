@@ -1,5 +1,6 @@
 import re
 import textstat
+from logger_config import logger
 
 
 def calculate_dialogue_percentage(text):
@@ -16,7 +17,7 @@ def calculate_dialogue_percentage(text):
     return dialogue_percentage
 
 
-def combine_short_strings(strings: list[str], minimum_words=5) -> list[str]:
+def combine_short_strings(strings: list[str], minimum_words=7) -> list[str]:
     """Combine short strings (less than minimum_words) with the next string in the list.
     This is useful for pieces of text that are too small for an LLM to make inference
     for feature extraction"""
@@ -24,7 +25,9 @@ def combine_short_strings(strings: list[str], minimum_words=5) -> list[str]:
     i = 0
     while i < len(strings) - 1:
         if (len(strings[i].split()) < minimum_words) and (len(strings[i]) > 0):
-            print(f"Combining [{strings[i]}] and [{strings[i + 1]}]")
+            logger.info(
+                f"Combining ...[{strings[i][:20]}] and [{strings[i + 1][:20]}...]"
+            )
             strings[i + 1] = strings[i] + " " + strings[i + 1]
             strings.pop(i)
         else:
@@ -44,4 +47,5 @@ def get_text_statistics(text: str) -> dict[str]:
     text_statistics["sentence_count"] = textstat.sentence_count(text)
     text_statistics["word_count"] = textstat.lexicon_count(text, removepunct=True)
 
+    logger.debug(f"Text statistics: {text_statistics}")
     return text_statistics

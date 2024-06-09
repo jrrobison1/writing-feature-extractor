@@ -3,15 +3,13 @@ from typing import Optional
 from langchain_core.pydantic_v1 import BaseModel, Field
 
 from features.writing_feature import WritingFeature
-from features.writing_feature_graph_mode import WritingFeatureGraphMode
+from features.graph_mode import GraphMode
 
 
 class PaceFeature(WritingFeature):
     """Feature extractor for the pace of the narrative."""
 
-    def __init__(
-        self, graph_mode: WritingFeatureGraphMode = WritingFeatureGraphMode.BAR
-    ):
+    def __init__(self, graph_mode: GraphMode = GraphMode.BAR):
         self.graph_mode = graph_mode
 
     results: list[int] = []
@@ -81,13 +79,13 @@ class PaceFeature(WritingFeature):
             return 7
 
     def add_result(self, enum_value):
-        if self.graph_mode == WritingFeatureGraphMode.BAR:
+        if self.graph_mode == GraphMode.BAR:
             self.results.append(self.get_int_for_enum(enum_value))
-        elif self.graph_mode == WritingFeatureGraphMode.COLOR:
+        elif self.graph_mode == GraphMode.COLOR:
             self.results.append(enum_value)
         else:
             raise ValueError("Invalid graph mode")
 
-    def set_graph_mode(self, graph_mode: WritingFeatureGraphMode):
+    def set_graph_mode(self, graph_mode: GraphMode):
         self.graph_mode = graph_mode
         return self

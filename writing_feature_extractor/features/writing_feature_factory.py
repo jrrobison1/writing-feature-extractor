@@ -10,8 +10,8 @@ from features.pace_feature import PaceFeature
 
 from langchain_core.pydantic_v1 import Field, BaseModel, create_model
 
-from features.writing_feature_graph_mode import (
-    WritingFeatureGraphMode,
+from features.graph_mode import (
+    GraphMode,
 )
 from features.descriptive_detail_level import (
     DescriptiveDetailLevelFeature,
@@ -26,7 +26,7 @@ class WritingFeatureFactory:
 
     @staticmethod
     def get_dynamic_model(
-        features: list[Tuple[AvailableWritingFeatures, WritingFeatureGraphMode]],
+        features: list[Tuple[AvailableWritingFeatures, GraphMode]],
     ) -> Tuple[type[BaseModel], list[WritingFeature]]:
         """Creates a dynamic pydantic model based on the given writing features"""
 

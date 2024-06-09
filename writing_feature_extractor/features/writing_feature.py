@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from features.writing_feature_graph_mode import WritingFeatureGraphMode
+from features.graph_mode import GraphMode
 
 
 class WritingFeature(ABC):
@@ -57,6 +57,6 @@ class WritingFeature(ABC):
         pass
 
     @abstractmethod
-    def set_graph_mode(self, graph_mode: WritingFeatureGraphMode):
+    def set_graph_mode(self, graph_mode: GraphMode):
         """Set the graph mode for this feature"""
         pass
