@@ -54,7 +54,15 @@ class PaceFeature(WritingFeature):
         return "Pace/speed of the narrative."
 
     def get_graph_colors(self) -> dict[str, str]:
-        raise NotImplemented("PaceFeature does not have graph colors")
+        return {
+            "very slow": "#FFCCCC",
+            "slow": "#FF9999",
+            "medium slow": "#FF6666",
+            "medium": "#FF3333",
+            "medium fast": "#FF0000",
+            "fast": "#CC0000",
+            "very fast": "#990000",
+        }
 
     def get_int_for_enum(self, pace: Pace):
         if pace == PaceFeature.Pace.VERY_SLOW:
@@ -73,7 +81,12 @@ class PaceFeature(WritingFeature):
             return 7
 
     def add_result(self, enum_value):
-        self.results.append(self.get_int_for_enum(enum_value))
+        if self.graph_mode == WritingFeatureGraphMode.BAR:
+            self.results.append(self.get_int_for_enum(enum_value))
+        elif self.graph_mode == WritingFeatureGraphMode.COLOR:
+            self.results.append(enum_value)
+        else:
+            raise ValueError("Invalid graph mode")
 
     def set_graph_mode(self, graph_mode: WritingFeatureGraphMode):
         self.graph_mode = graph_mode

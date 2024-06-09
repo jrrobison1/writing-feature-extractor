@@ -10,6 +10,10 @@ from features.pace_feature import PaceFeature
 
 from langchain_core.pydantic_v1 import Field, BaseModel, create_model
 
+from features.writing_feature_graph_mode import (
+    WritingFeatureGraphMode,
+)
+
 
 class WritingFeatureFactory:
     """Factory class to create dynamic pydantic models based on the given
@@ -17,21 +21,21 @@ class WritingFeatureFactory:
 
     @staticmethod
     def get_dynamic_model(
-        features: list[AvailableWritingFeatures],
+        features: list[Tuple[AvailableWritingFeatures, WritingFeatureGraphMode]],
     ) -> Tuple[type[BaseModel], list[WritingFeature]]:
         """Creates a dynamic pydantic model based on the given writing features"""
 
         selected_features = dict()
         feature_collectors = []
-        for feature in features:
+        for feature, graph_mode in features:
             if feature == AvailableWritingFeatures.PACING:
-                current_feature = PaceFeature()
+                current_feature = PaceFeature(graph_mode)
             if feature == AvailableWritingFeatures.MOOD:
-                current_feature = MoodFeature()
+                current_feature = MoodFeature(graph_mode)
             if feature == AvailableWritingFeatures.EMOTIONAL_INTENSITY:
-                current_feature = EmotionalIntensityFeature()
+                current_feature = EmotionalIntensityFeature(graph_mode)
             if feature == AvailableWritingFeatures.MYSTERY_LEVEL:
-                current_feature = MysteryLevelFeature()
+                current_feature = MysteryLevelFeature(graph_mode)
 
             selected_features[current_feature.get_pydantic_feature_label()] = (
                 current_feature.get_pydantic_feature_type(),

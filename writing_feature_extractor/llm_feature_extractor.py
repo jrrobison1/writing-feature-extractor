@@ -14,6 +14,9 @@ from features.available_writing_features import (
 from features.writing_feature import WritingFeature
 from model_factory import ModelFactory
 from available_models import AvailableModels
+from features.writing_feature_graph_mode import (
+    WritingFeatureGraphMode,
+)
 
 
 logger = logging.getLogger(__name__)
@@ -31,7 +34,10 @@ logging.getLogger(__name__).setLevel(logging.INFO)
 SECTION_DELIMETER = "***"
 
 feature_collectors, DynamicFeatureModel = WritingFeatureFactory.get_dynamic_model(
-    [AvailableWritingFeatures.PACING, AvailableWritingFeatures.MOOD]
+    [
+        (AvailableWritingFeatures.MYSTERY_LEVEL, WritingFeatureGraphMode.BAR),
+        (AvailableWritingFeatures.PACING, WritingFeatureGraphMode.COLOR),
+    ]
 )
 llm = ModelFactory.get_llm_model(AvailableModels.GPT_3_5, DynamicFeatureModel)
 

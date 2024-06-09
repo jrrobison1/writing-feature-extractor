@@ -56,7 +56,16 @@ class EmotionalIntensityFeature(WritingFeature):
         return "Strength or intensity of emotions expressed in the text"
 
     def get_graph_colors(self) -> dict[str, str]:
-        raise NotImplemented("EmotionalIntensityFeature does not have graph colors")
+        return {
+            "none": "#FFFFFF",
+            "very low": "#FFCCCC",
+            "low": "#FF9999",
+            "medium low": "#FF6666",
+            "medium": "#FF3333",
+            "medium high": "#FF0000",
+            "high": "#CC0000",
+            "very high": "#990000",
+        }
 
     def get_int_for_enum(self, emotional_intensity: EmotionalIntensity):
         if emotional_intensity == EmotionalIntensityFeature.EmotionalIntensity.NONE:
@@ -86,7 +95,12 @@ class EmotionalIntensityFeature(WritingFeature):
             return 7
 
     def add_result(self, enum_value):
-        self.results.append(self.get_int_for_enum(enum_value))
+        if self.graph_mode == WritingFeatureGraphMode.BAR:
+            self.results.append(self.get_int_for_enum(enum_value))
+        elif self.graph_mode == WritingFeatureGraphMode.COLOR:
+            self.results.append(enum_value)
+        else:
+            raise ValueError("Invalid graph mode")
 
     def set_graph_mode(self, graph_mode: WritingFeatureGraphMode):
         self.graph_mode = graph_mode
