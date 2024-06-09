@@ -1,4 +1,5 @@
 import re
+import textstat
 
 
 def calculate_dialogue_percentage(text):
@@ -32,3 +33,16 @@ def combine_short_strings(strings: list[str], minimum_words=5) -> list[str]:
         else:
             i += 1
     return strings
+
+
+def get_text_statistics(text: str) -> dict[str]:
+    text_statistics = dict()
+    dialogue_percentage = calculate_dialogue_percentage(text)
+    dp_as_string = f"{dialogue_percentage:.2f}%"
+    text_statistics["dialogue_percentage"] = dp_as_string
+    text_statistics["readability_ease"] = textstat.flesch_reading_ease(text)
+    text_statistics["readability_grade"] = textstat.flesch_kincaid_grade(text)
+    text_statistics["sentence_count"] = textstat.sentence_count(text)
+    text_statistics["word_count"] = textstat.lexicon_count(text, removepunct=True)
+
+    return text_statistics
