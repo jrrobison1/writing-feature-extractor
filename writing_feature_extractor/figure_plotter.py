@@ -71,7 +71,7 @@ def get_graph(
     positions = [sum(df["Width"][:i]) for i in range(len(df))]
     center_positions = [pos + df["Width"][i] / 2 for i, pos in enumerate(positions)]
 
-    fig, ax = plt.subplots(figsize=(10, 6))
+    _, ax = plt.subplots(figsize=(10, 6))
 
     bars = ax.bar(
         positions,

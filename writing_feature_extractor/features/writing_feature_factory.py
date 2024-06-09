@@ -13,6 +13,11 @@ from langchain_core.pydantic_v1 import Field, BaseModel, create_model
 from features.writing_feature_graph_mode import (
     WritingFeatureGraphMode,
 )
+from features.descriptive_detail_level import (
+    DescriptiveDetailLevelFeature,
+)
+from features.humor_level import HumorLevelFeature
+from features.romance_level import RomanceLevelFeature
 
 
 class WritingFeatureFactory:
@@ -30,12 +35,20 @@ class WritingFeatureFactory:
         for feature, graph_mode in features:
             if feature == AvailableWritingFeatures.PACING:
                 current_feature = PaceFeature(graph_mode)
-            if feature == AvailableWritingFeatures.MOOD:
+            elif feature == AvailableWritingFeatures.MOOD:
                 current_feature = MoodFeature(graph_mode)
-            if feature == AvailableWritingFeatures.EMOTIONAL_INTENSITY:
+            elif feature == AvailableWritingFeatures.EMOTIONAL_INTENSITY:
                 current_feature = EmotionalIntensityFeature(graph_mode)
-            if feature == AvailableWritingFeatures.MYSTERY_LEVEL:
+            elif feature == AvailableWritingFeatures.MYSTERY_LEVEL:
                 current_feature = MysteryLevelFeature(graph_mode)
+            elif feature == AvailableWritingFeatures.DESCRIPTIVE_DETAIL_LEVEL:
+                current_feature = DescriptiveDetailLevelFeature(graph_mode)
+            elif feature == AvailableWritingFeatures.HUMOR_LEVEL:
+                current_feature = HumorLevelFeature(graph_mode)
+            elif feature == AvailableWritingFeatures.ROMANCE_LEVEL:
+                current_feature = RomanceLevelFeature(graph_mode)
+            else:
+                raise ValueError(f"Feature {feature} is not supported.")
 
             selected_features[current_feature.get_pydantic_feature_label()] = (
                 current_feature.get_pydantic_feature_type(),

@@ -35,8 +35,11 @@ SECTION_DELIMETER = "***"
 
 feature_collectors, DynamicFeatureModel = WritingFeatureFactory.get_dynamic_model(
     [
-        (AvailableWritingFeatures.MYSTERY_LEVEL, WritingFeatureGraphMode.BAR),
-        (AvailableWritingFeatures.PACING, WritingFeatureGraphMode.COLOR),
+        (
+            AvailableWritingFeatures.DESCRIPTIVE_DETAIL_LEVEL,
+            WritingFeatureGraphMode.BAR,
+        ),
+        (AvailableWritingFeatures.ROMANCE_LEVEL, WritingFeatureGraphMode.COLOR),
     ]
 )
 llm = ModelFactory.get_llm_model(AvailableModels.GPT_3_5, DynamicFeatureModel)

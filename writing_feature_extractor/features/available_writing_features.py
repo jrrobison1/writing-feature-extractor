@@ -8,3 +8,6 @@ class AvailableWritingFeatures(str, Enum):
     EMOTIONAL_INTENSITY = "emotional intensity"
     MYSTERY_LEVEL = "mystery level"
     MOOD = "mood"
+    DESCRIPTIVE_DETAIL_LEVEL = "descriptive level detail"
+    HUMOR_LEVEL = "humor level"
+    ROMANCE_LEVEL = "romance level"
