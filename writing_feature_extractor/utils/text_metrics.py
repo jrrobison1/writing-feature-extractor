@@ -17,7 +17,7 @@ def calculate_dialogue_percentage(text):
     return dialogue_percentage
 
 
-def combine_short_strings(strings: list[str], minimum_words=7) -> list[str]:
+def combine_short_strings(strings: list[str], minimum_words=8) -> list[str]:
     """Combine short strings (less than minimum_words) with the next string in the list.
     This is useful for pieces of text that are too small for an LLM to make inference
     for feature extraction"""

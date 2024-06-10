@@ -18,6 +18,7 @@ from features.descriptive_detail_level import (
 )
 from features.humor_level import HumorLevelFeature
 from features.romance_level import RomanceLevelFeature
+from features.level_of_suspense import LevelOfSuspenseFeature
 
 
 class WritingFeatureFactory:
@@ -47,6 +48,8 @@ class WritingFeatureFactory:
                 current_feature = HumorLevelFeature(graph_mode)
             elif feature == AvailableWritingFeatures.ROMANCE_LEVEL:
                 current_feature = RomanceLevelFeature(graph_mode)
+            elif feature == AvailableWritingFeatures.LEVEL_OF_SUSPENSE:
+                current_feature = LevelOfSuspenseFeature(graph_mode)
             else:
                 raise ValueError(f"Feature {feature} is not supported.")
 

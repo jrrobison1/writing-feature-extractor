@@ -1,6 +1,7 @@
 import sys
 import traceback
 from logger_config import logger
+from dotenv import load_dotenv
 
 from prompt_templates.basic_prompt import prompt_template
 from utils.text_metrics import get_text_statistics
@@ -25,13 +26,13 @@ SECTION_DELIMETER = "***"
 feature_collectors, DynamicFeatureModel = WritingFeatureFactory.get_dynamic_model(
     [
         (
-            AvailableWritingFeatures.EMOTIONAL_INTENSITY,
+            AvailableWritingFeatures.LEVEL_OF_SUSPENSE,
             GraphMode.BAR,
         ),
-        (AvailableWritingFeatures.MYSTERY_LEVEL, GraphMode.COLOR),
+        (AvailableWritingFeatures.EMOTIONAL_INTENSITY, GraphMode.COLOR),
     ]
 )
-llm = ModelFactory.get_llm_model(AvailableModels.GPT_3_5, DynamicFeatureModel)
+llm = ModelFactory.get_llm_model(AvailableModels.LLAMA3_70B, DynamicFeatureModel)
 logger.debug(f"Obtained LLM model: {llm}")
 
 
@@ -39,11 +40,12 @@ def process_paragraph(paragraph: str, feature_collectors: list[WritingFeature]):
     """Run LLM on a paragraph to perform feature extraction"""
 
     try:
-        result = llm.invoke(prompt_template.format(input=paragraph))
+        result = llm.invoke(input=paragraph)
         logger.info(f"LLM Result: [{str(result)}]")
     except Exception as e:
+        result = result
         logger.error("Error invoking the LLM", e)
-        logger.error(traceback.format_exc())
+        logger.debug(traceback.format_exc())
 
     result_dict = result.dict()
     result_dict["text_statistics"] = get_text_statistics(paragraph)
@@ -70,7 +72,7 @@ def process_section(section: str):
             process_paragraph(paragraph, feature_collectors)
         except Exception as e:
             logger.error("Error processing paragraph", e)
-            logger.error(traceback.format_exc())
+            logger.debug(traceback.format_exc())
             continue
 
     try:
@@ -80,7 +82,7 @@ def process_section(section: str):
         )
     except Exception as e:
         logger.error("Error generating graph", e)
-        logger.error(traceback.format_exc())
+        logger.debug(traceback.format_exc())
 
     print(f"----------SECTION END----------\n\n")
 
@@ -97,6 +99,7 @@ def extract_features(sections: list[str]):
 
 
 if __name__ == "__main__":
+    load_dotenv()
     with open(sys.argv[1]) as f:
         file_text = f.read()
         f.close()

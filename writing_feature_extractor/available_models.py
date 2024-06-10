@@ -10,3 +10,5 @@ class AvailableModels(str, Enum):
     CLAUDE_OPUS = "claude-3-opus-20240229"
     CLAUDE_SONNET = "claude-3-sonnet-20240229"
     CLAUDE_HAIKU = "claude-3-haiku-20240307"
+    GEMINI_PRO = "gemini-pro-1.5"
+    TOGETHER_LLAMA3_70B = "together-llama3-70b-8192"

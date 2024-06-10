@@ -11,3 +11,4 @@ class AvailableWritingFeatures(str, Enum):
     DESCRIPTIVE_DETAIL_LEVEL = "descriptive level detail"
     HUMOR_LEVEL = "humor level"
     ROMANCE_LEVEL = "romance level"
+    LEVEL_OF_SUSPENSE = "level of suspense"
