@@ -32,7 +32,7 @@ feature_collectors, DynamicFeatureModel = WritingFeatureFactory.get_dynamic_mode
         (AvailableWritingFeatures.EMOTIONAL_INTENSITY, GraphMode.COLOR),
     ]
 )
-llm = ModelFactory.get_llm_model(AvailableModels.LLAMA3_70B, DynamicFeatureModel)
+llm = ModelFactory.get_llm_model(AvailableModels.GPT_3_5, DynamicFeatureModel)
 logger.debug(f"Obtained LLM model: {llm}")
 
 
