@@ -54,13 +54,17 @@ def generate_graph_from_csv(filename: str, bar_feature: str, color_feature: str)
             f"{bar_feature}. {color_feature} is indicated by color.", fontsize=14
         )
 
+        # Set y-axis limits
+        y_min, y_max = 0, df[bar_feature].max() * 1.1
+        ax.set_ylim(y_min, y_max)
+
         # Remove y-axis ticks
         ax.set_yticks([])
 
         # Add "None" at the bottom and "Very High" at the top
         ax.text(
             -0.05,
-            0,
+            y_min,
             "None",
             va="bottom",
             ha="right",
@@ -69,7 +73,7 @@ def generate_graph_from_csv(filename: str, bar_feature: str, color_feature: str)
         )
         ax.text(
             -0.05,
-            1,
+            y_max,
             "Very High",
             va="top",
             ha="right",

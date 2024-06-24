@@ -1,0 +1,13 @@
+features:
+  - name: EMOTIONAL_INTENSITY
+    graph_mode: BAR
+  - name: MOOD
+    graph_mode: COLOR
+  - name: DESCRIPTIVE_DETAIL_LEVEL
+    graph_mode: SAVE_ONLY
+  - name: MYSTERY_LEVEL
+    graph_mode: SAVE_ONLY
+  - name: PACING
+    graph_mode: SAVE_ONLY
+  - name: LEVEL_OF_SUSPENSE
+    graph_mode: SAVE_ONLY

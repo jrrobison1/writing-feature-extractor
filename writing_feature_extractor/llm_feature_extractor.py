@@ -1,40 +1,33 @@
 import sys
 import argparse
 import traceback
-from logger_config import logger
+import yaml
+from writing_feature_extractor.logger_config import logger
 from dotenv import load_dotenv
 
-from prompt_templates.basic_prompt import prompt_template
-from utils.text_metrics import get_text_statistics
-from utils.text_metrics import combine_short_strings
-from figure_plotter import get_graph
+from writing_feature_extractor.prompt_templates.basic_prompt import prompt_template
+from writing_feature_extractor.utils.text_metrics import get_text_statistics
+from writing_feature_extractor.utils.text_metrics import combine_short_strings
+from writing_feature_extractor.figure_plotter import get_graph
 
-from features.writing_feature_factory import WritingFeatureFactory
-from features.available_writing_features import AvailableWritingFeatures
-from features.writing_feature import WritingFeature
-from model_factory import ModelFactory
-from available_models import AvailableModels
-from features.graph_mode import GraphMode
-from save_results_to_csv import save_results_to_csv
-from generate_graph_from_csv import generate_graph_from_csv
+from writing_feature_extractor.features.writing_feature_factory import (
+    WritingFeatureFactory,
+)
+from writing_feature_extractor.features.available_writing_features import (
+    AvailableWritingFeatures,
+)
+from writing_feature_extractor.features.writing_feature import WritingFeature
+from writing_feature_extractor.model_factory import ModelFactory
+from writing_feature_extractor.available_models import AvailableModels
+from writing_feature_extractor.features.graph_mode import GraphMode
+from writing_feature_extractor.save_results_to_csv import save_results_to_csv
+from writing_feature_extractor.generate_graph_from_csv import generate_graph_from_csv
+from writing_feature_extractor.feature_config import load_feature_config
 
 SECTION_DELIMETER = "***"
 
-feature_collectors, DynamicFeatureModel = WritingFeatureFactory.get_dynamic_model(
-    [
-        (AvailableWritingFeatures.EMOTIONAL_INTENSITY, GraphMode.BAR),
-        (AvailableWritingFeatures.MOOD, GraphMode.COLOR),
-        (AvailableWritingFeatures.DESCRIPTIVE_DETAIL_LEVEL, GraphMode.SAVE_ONLY),
-        (AvailableWritingFeatures.MYSTERY_LEVEL, GraphMode.SAVE_ONLY),
-        (AvailableWritingFeatures.PACING, GraphMode.SAVE_ONLY),
-        (AvailableWritingFeatures.LEVEL_OF_SUSPENSE, GraphMode.SAVE_ONLY),
-    ]
-)
-llm = ModelFactory.get_llm_model(AvailableModels.GPT_3_5, DynamicFeatureModel)
-logger.debug(f"Obtained LLM model: {llm}")
 
-
-def process_text(text: str, feature_collectors: list[WritingFeature]):
+def process_text(text: str, feature_collectors: list[WritingFeature], llm):
     """Run LLM on a text to perform feature extraction"""
     try:
         result = llm.invoke(input=text)
@@ -54,12 +47,14 @@ def process_text(text: str, feature_collectors: list[WritingFeature]):
         feature.add_result(result_dict[feature.get_pydantic_feature_label()])
 
 
-def process_paragraph(paragraph: str, feature_collectors: list[WritingFeature]):
+def process_paragraph(paragraph: str, feature_collectors: list[WritingFeature], llm):
     """Process a single paragraph"""
-    process_text(paragraph, feature_collectors)
+    process_text(paragraph, feature_collectors, llm)
 
 
-def process_section(section: str, mode: str):
+def process_section(
+    section: str, mode: str, feature_collectors: list[WritingFeature], llm
+):
     """Process a 'section' of text based on the analysis mode"""
     print(f"----------SECTION BEGIN----------")
 
@@ -70,7 +65,7 @@ def process_section(section: str, mode: str):
         paragraphs = combine_short_strings(paragraphs)
         for paragraph in paragraphs:
             try:
-                process_paragraph(paragraph, feature_collectors)
+                process_paragraph(paragraph, feature_collectors, llm)
             except Exception as e:
                 logger.error("Error processing paragraph", e)
                 logger.debug(traceback.format_exc())
@@ -82,12 +77,12 @@ def process_section(section: str, mode: str):
             logger.error("Error generating graph", e)
             logger.debug(traceback.format_exc())
     elif mode == "section":
-        process_text(section, feature_collectors)
+        process_text(section, feature_collectors, llm)
 
     print(f"----------SECTION END----------\n\n")
 
 
-def extract_features(sections: list[str], mode: str):
+def extract_features(sections: list[str], mode: str, feature_collectors, llm):
     """Extract features from the text and display them in a graph."""
     try:
         for feature in feature_collectors:
@@ -101,7 +96,7 @@ def extract_features(sections: list[str], mode: str):
                     paragraphs = combine_short_strings(paragraphs)
                     logger.info("-----SECTION BEGIN-----")
                     for paragraph in paragraphs:
-                        process_text(paragraph, feature_collectors)
+                        process_text(paragraph, feature_collectors, llm)
                         text_units.append(paragraph)
                     logger.info("-----SECTION END-----")
                     logger.info("Saving results to CSV...")
@@ -111,7 +106,7 @@ def extract_features(sections: list[str], mode: str):
                     input("Press Enter to continue...")
 
                 elif mode == "section":
-                    process_text(section, feature_collectors)
+                    process_text(section, feature_collectors, llm)
                     text_units.append(section)
                 else:
                     logger.error(f"Invalid mode: {mode}")
@@ -130,6 +125,19 @@ def extract_features(sections: list[str], mode: str):
         logger.error(f"Error in extract_features: {e}")
         logger.debug(traceback.format_exc())
         return None
+
+
+def load_feature_config(config_file):
+    with open(config_file, "r") as file:
+        config = yaml.safe_load(file)
+
+    features = []
+    for feature in config["features"]:
+        feature_name = getattr(AvailableWritingFeatures, feature["name"])
+        graph_mode = getattr(GraphMode, feature["graph_mode"])
+        features.append((feature_name, graph_mode))
+
+    return features
 
 
 def main():
@@ -158,6 +166,11 @@ def main():
         default="feature_results.csv",
         help="CSV file to save results to or read from",
     )
+    parser.add_argument(
+        "--config",
+        default="features_config.yaml",
+        help="YAML configuration file for features",
+    )
 
     args = parser.parse_args()
 
@@ -172,8 +185,18 @@ def main():
         with open(args.file) as f:
             text = f.read()
 
+        # Load feature configuration
+        features = load_feature_config(args.config)
+
+        feature_collectors, DynamicFeatureModel = (
+            WritingFeatureFactory.get_dynamic_model(features)
+        )
+
+        llm = ModelFactory.get_llm_model(AvailableModels.GPT_3_5, DynamicFeatureModel)
+        logger.debug(f"Obtained LLM model: {llm}")
+
         sections = text.split(SECTION_DELIMETER)
-        result = extract_features(sections, args.mode)
+        result = extract_features(sections, args.mode, feature_collectors, llm)
 
         if result is None:
             logger.error("Failed to extract features. Exiting.")
