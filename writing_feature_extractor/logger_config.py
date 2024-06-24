@@ -4,7 +4,7 @@ from logging.handlers import RotatingFileHandler
 
 # Create a logger for your module
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 # Create handlers
 file_handler = RotatingFileHandler(
