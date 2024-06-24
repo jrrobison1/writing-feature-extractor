@@ -6,3 +6,4 @@ class GraphMode(str, Enum):
 
     BAR = "bar"
     COLOR = "color"
+    SAVE_ONLY = "save_only"

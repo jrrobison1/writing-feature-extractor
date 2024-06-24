@@ -62,6 +62,8 @@ class LevelOfSuspenseFeature(WritingFeature):
             self.results.append(self.get_int_for_enum(enum_value))
         elif self.graph_mode == GraphMode.COLOR:
             self.results.append(enum_value)
+        elif self.graph_mode == GraphMode.SAVE_ONLY:
+            self.results.append(self.get_int_for_enum(enum_value))
         else:
             raise ValueError("Invalid graph mode")
 

@@ -24,6 +24,10 @@ feature_collectors, DynamicFeatureModel = WritingFeatureFactory.get_dynamic_mode
     [
         (AvailableWritingFeatures.EMOTIONAL_INTENSITY, GraphMode.BAR),
         (AvailableWritingFeatures.MOOD, GraphMode.COLOR),
+        (AvailableWritingFeatures.DESCRIPTIVE_DETAIL_LEVEL, GraphMode.SAVE_ONLY),
+        (AvailableWritingFeatures.MYSTERY_LEVEL, GraphMode.SAVE_ONLY),
+        (AvailableWritingFeatures.PACING, GraphMode.SAVE_ONLY),
+        (AvailableWritingFeatures.LEVEL_OF_SUSPENSE, GraphMode.SAVE_ONLY),
     ]
 )
 llm = ModelFactory.get_llm_model(AvailableModels.GPT_3_5, DynamicFeatureModel)
