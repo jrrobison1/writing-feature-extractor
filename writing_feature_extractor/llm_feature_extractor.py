@@ -15,6 +15,8 @@ from features.writing_feature import WritingFeature
 from model_factory import ModelFactory
 from available_models import AvailableModels
 from features.graph_mode import GraphMode
+from save_results_to_csv import save_results_to_csv
+from generate_graph_from_csv import generate_graph_from_csv
 
 SECTION_DELIMETER = "***"
 
@@ -83,48 +85,105 @@ def process_section(section: str, mode: str):
 
 def extract_features(sections: list[str], mode: str):
     """Extract features from the text and display them in a graph."""
-    for section in sections:
-        try:
-            process_section(section, mode)
-        except Exception as e:
-            logger.error(e)
-            continue
+    try:
+        for feature in feature_collectors:
+            feature.results.clear()
 
-    if mode == "section":
-        try:
-            logger.info(
-                f"Feature collectors before graph generation: {feature_collectors}"
-            )
-            logger.info(
-                f"Feature collector types: {[type(fc) for fc in feature_collectors]}"
-            )
-            logger.info(
-                f"Feature collector graph modes: {[fc.graph_mode for fc in feature_collectors]}"
-            )
-            get_graph(
-                feature_collectors, [f"Section {i+1}" for i in range(len(sections))]
-            )
-        except Exception as e:
-            logger.error("Error generating graph", e)
-            logger.debug(traceback.format_exc())
+        text_units = []
+        for section in sections:
+            try:
+                if mode == "paragraph":
+                    paragraphs = section.split("\n")
+                    paragraphs = combine_short_strings(paragraphs)
+                    logger.info("-----SECTION BEGIN-----")
+                    for paragraph in paragraphs:
+                        process_text(paragraph, feature_collectors)
+                        text_units.append(paragraph)
+                    logger.info("-----SECTION END-----")
+                    logger.info("Saving results to CSV...")
+                    save_results_to_csv(
+                        feature_collectors, text_units, "paragraphs.csv"
+                    )
+                    input("Press Enter to continue...")
+
+                elif mode == "section":
+                    process_text(section, feature_collectors)
+                    text_units.append(section)
+                else:
+                    logger.error(f"Invalid mode: {mode}")
+                    return None
+            except Exception as e:
+                logger.error(f"Error processing section: {e}")
+                logger.debug(traceback.format_exc())
+
+        logger.debug(f"Number of text units processed: {len(text_units)}")
+        logger.debug(
+            f"Number of results in each feature collector: {[len(fc.results) for fc in feature_collectors]}"
+        )
+
+        return feature_collectors, text_units
+    except Exception as e:
+        logger.error(f"Error in extract_features: {e}")
+        logger.debug(traceback.format_exc())
+        return None
 
 
-if __name__ == "__main__":
-    load_dotenv()
-
-    parser = argparse.ArgumentParser(description="Extract writing features from text.")
-    parser.add_argument("file", help="Input text file to analyze")
+def main():
+    parser = argparse.ArgumentParser(
+        description="Extract writing features and generate graphs."
+    )
+    parser.add_argument("file", nargs="?", help="Input text file to analyze")
     parser.add_argument(
         "--mode",
         choices=["paragraph", "section"],
         default="paragraph",
         help="Analysis mode: paragraph-by-paragraph or section-by-section",
     )
+    parser.add_argument("--save", action="store_true", help="Save results to CSV")
+    parser.add_argument(
+        "--graph", action="store_true", help="Generate graph from saved CSV"
+    )
+    parser.add_argument(
+        "--bar-feature", help="Feature to use for bar heights when generating graph"
+    )
+    parser.add_argument(
+        "--color-feature", help="Feature to use for bar colors when generating graph"
+    )
+    parser.add_argument(
+        "--csv-file",
+        default="feature_results.csv",
+        help="CSV file to save results to or read from",
+    )
 
     args = parser.parse_args()
 
-    with open(args.file) as f:
-        file_text = f.read()
+    if args.graph:
+        if not (args.bar_feature and args.color_feature):
+            logger.error(
+                "Please specify --bar-feature and --color-feature when using --graph"
+            )
+            return
+        generate_graph_from_csv(args.csv_file, args.bar_feature, args.color_feature)
+    elif args.file:
+        with open(args.file) as f:
+            text = f.read()
 
-    sections = file_text.split(SECTION_DELIMETER)
-    extract_features(sections, args.mode)
+        sections = text.split(SECTION_DELIMETER)
+        result = extract_features(sections, args.mode)
+
+        if result is None:
+            logger.error("Failed to extract features. Exiting.")
+            return
+
+        feature_collectors, text_units = result
+
+        if args.save:
+            save_results_to_csv(feature_collectors, text_units, args.csv_file)
+    else:
+        logger.error(
+            "Please provide an input file or use --graph with a saved CSV file"
+        )
+
+
+if __name__ == "__main__":
+    main()
