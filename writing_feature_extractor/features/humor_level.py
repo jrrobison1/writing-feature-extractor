@@ -32,10 +32,10 @@ class HumorLevelFeature(WritingFeature):
 
     def get_graph_colors(self) -> dict[str, str]:
         return {
-            "none": "#FFFFFF",
-            "low": "#FFE5CC",
-            "medium": "#FFB266",
-            "high": "#FF8C00",
+            "0": "#FFFFFF",
+            "1": "#FFE5CC",
+            "2": "#FFB266",
+            "3": "#FF8C00",
         }
 
     def get_pydantic_feature_label(self):

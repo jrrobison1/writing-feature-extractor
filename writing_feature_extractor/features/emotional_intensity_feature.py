@@ -55,14 +55,14 @@ class EmotionalIntensityFeature(WritingFeature):
 
     def get_graph_colors(self) -> dict[str, str]:
         return {
-            "none": "#FFFFFF",
-            "very low": "#FFCCCC",
-            "low": "#FF9999",
-            "medium low": "#FF6666",
-            "medium": "#FF3333",
-            "medium high": "#FF0000",
-            "high": "#CC0000",
-            "very high": "#990000",
+            "0": "#FFFFFF",
+            "1": "#FFCCCC",
+            "2": "#FF9999",
+            "3": "#FF6666",
+            "4": "#FF3333",
+            "5": "#FF0000",
+            "6": "#CC0000",
+            "7": "#990000",
         }
 
     def get_int_for_enum(self, emotional_intensity: EmotionalIntensity):

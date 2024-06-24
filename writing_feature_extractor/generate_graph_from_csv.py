@@ -1,13 +1,13 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.colors as mcolors
 import numpy as np
-from writing_feature_extractor.logger_config import logger
+import json
+from logger_config import logger
 
 
 def generate_graph_from_csv(filename: str, bar_feature: str, color_feature: str):
     """
-    Generate a graph from the saved CSV file.
+    Generate a graph from the saved CSV file using predefined colors and custom y-axis labels.
 
     :param filename: Name of the CSV file to read results from
     :param bar_feature: Name of the feature to use for bar heights
@@ -16,6 +16,10 @@ def generate_graph_from_csv(filename: str, bar_feature: str, color_feature: str)
     try:
         # Read the CSV file
         df = pd.read_csv(filename)
+
+        # Extract color maps
+        color_maps = json.loads(df["ColorMaps"].iloc[0])
+        color_dict = color_maps[color_feature]
 
         # Create the plot
         fig, ax = plt.subplots(figsize=(15, 8))
@@ -32,26 +36,46 @@ def generate_graph_from_csv(filename: str, bar_feature: str, color_feature: str)
         positions = np.cumsum(df["Width"].values) - df["Width"].values
         center_positions = positions + df["Width"].values / 2
 
-        # Get unique values for color mapping
-        unique_colors = sorted(df[color_feature].unique())
-        color_map = plt.colormaps["Set1"](np.linspace(0, 1, len(unique_colors)))
-        color_dict = dict(zip(unique_colors, color_map))
-
         # Create the bar plot
         bars = ax.bar(
             positions,
             df[bar_feature],
             width=df["Width"].values,
-            color=[color_dict[val] for val in df[color_feature]],
+            color=[
+                color_dict.get(str(val).lower(), "#CCCCCC") for val in df[color_feature]
+            ],
             edgecolor="black",
             align="edge",
         )
 
         # Set labels and title
         ax.set_xlabel("Text Unit", fontsize=12)
-        ax.set_ylabel(bar_feature, fontsize=12)
-        title = f"{bar_feature}. {color_feature} is indicated by color."
-        ax.set_title(title, fontsize=14)
+        ax.set_title(
+            f"{bar_feature}. {color_feature} is indicated by color.", fontsize=14
+        )
+
+        # Remove y-axis ticks
+        ax.set_yticks([])
+
+        # Add "None" at the bottom and "Very High" at the top
+        ax.text(
+            -0.05,
+            0,
+            "None",
+            va="bottom",
+            ha="right",
+            fontsize=10,
+            transform=ax.get_yaxis_transform(),
+        )
+        ax.text(
+            -0.05,
+            1,
+            "Very High",
+            va="top",
+            ha="right",
+            fontsize=10,
+            transform=ax.get_yaxis_transform(),
+        )
 
         # Adjust x-axis ticks and labels
         num_ticks = 10
@@ -63,8 +87,15 @@ def generate_graph_from_csv(filename: str, bar_feature: str, color_feature: str)
         ax.set_ylim(0, df[bar_feature].max() * 1.1)
 
         # Add a color legend
+        unique_colors = sorted(set(df[color_feature]))
         legend_elements = [
-            plt.Rectangle((0, 0), 1, 1, facecolor=color_dict[c], edgecolor="black")
+            plt.Rectangle(
+                (0, 0),
+                1,
+                1,
+                facecolor=color_dict.get(str(c).lower(), "#CCCCCC"),
+                edgecolor="black",
+            )
             for c in unique_colors
         ]
         ax.legend(

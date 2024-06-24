@@ -1,6 +1,8 @@
 import csv
+import json
 from typing import List
 from writing_feature_extractor.features.writing_feature import WritingFeature
+from writing_feature_extractor.logger_config import logger
 
 
 def save_results_to_csv(
@@ -17,9 +19,11 @@ def save_results_to_csv(
     """
     try:
         with open(filename, "w", newline="") as csvfile:
-            fieldnames = ["Unit", "Text", "Length"] + [
-                fc.get_y_level_label() for fc in feature_collectors
-            ]
+            fieldnames = (
+                ["Unit", "Text", "Length"]
+                + [fc.get_y_level_label() for fc in feature_collectors]
+                + ["ColorMaps"]
+            )
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
             writer.writeheader()
@@ -29,9 +33,19 @@ def save_results_to_csv(
                     row[fc.get_y_level_label()] = (
                         fc.results[i - 1] if i <= len(fc.results) else ""
                     )
+
+                # Add color maps
+                color_maps = {
+                    fc.get_y_level_label(): fc.get_graph_colors()
+                    for fc in feature_collectors
+                }
+                row["ColorMaps"] = json.dumps(color_maps)
+
                 writer.writerow(row)
 
-        print(f"Results saved to {filename}")
+        logger.info(f"Results saved to {filename}")
     except Exception as e:
         logger.error(f"Error saving results to CSV: {e}")
-        logger.debug(traceback.format_exc())
+        import traceback
+
+        logger.debug(f"Error traceback: {traceback.format_exc()}")

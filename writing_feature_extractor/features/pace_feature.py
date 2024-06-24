@@ -53,13 +53,13 @@ class PaceFeature(WritingFeature):
 
     def get_graph_colors(self) -> dict[str, str]:
         return {
-            "very slow": "#FFCCCC",
-            "slow": "#FF9999",
-            "medium slow": "#FF6666",
-            "medium": "#FF3333",
-            "medium fast": "#FF0000",
-            "fast": "#CC0000",
-            "very fast": "#990000",
+            "0": "#FFCCCC",
+            "1": "#FF9999",
+            "2": "#FF6666",
+            "3": "#FF3333",
+            "4": "#FF0000",
+            "5": "#CC0000",
+            "6": "#990000",
         }
 
     def get_int_for_enum(self, pace: Pace):

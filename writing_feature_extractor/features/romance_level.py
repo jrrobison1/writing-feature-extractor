@@ -32,10 +32,10 @@ class RomanceLevelFeature(WritingFeature):
 
     def get_graph_colors(self) -> dict[str, str]:
         return {
-            "none": "#FFFFFF",
-            "low": "#CC99CC",
-            "medium": "#CC99CC",
-            "high": "#800080",
+            "0": "#FFFFFF",
+            "1": "#CC99CC",
+            "2": "#CC99CC",
+            "3": "#800080",
         }
 
     def get_pydantic_feature_label(self):
