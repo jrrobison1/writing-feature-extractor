@@ -1,11 +1,12 @@
-import numpy as np
-from writing_feature_extractor.logger_config import logger
 from typing import Optional, Tuple
-import pandas as pd
-import matplotlib.pyplot as plt
 
-from writing_feature_extractor.features.writing_feature import WritingFeature
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+
 from writing_feature_extractor.features.graph_mode import GraphMode
+from writing_feature_extractor.features.writing_feature import WritingFeature
+from writing_feature_extractor.logger_config import logger
 
 
 def bar_and_color_features(

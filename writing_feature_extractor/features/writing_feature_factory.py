@@ -1,26 +1,24 @@
 from typing import Tuple
-from writing_feature_extractor.features.writing_feature import WritingFeature
+
+from langchain_core.pydantic_v1 import BaseModel, Field, create_model
+
 from writing_feature_extractor.features.available_writing_features import (
     AvailableWritingFeatures,
-)
-from writing_feature_extractor.features.emotional_intensity_feature import (
-    EmotionalIntensityFeature,
-)
-from writing_feature_extractor.features.mood_feature import MoodFeature
-from writing_feature_extractor.features.mystery_level_feature import MysteryLevelFeature
-from writing_feature_extractor.features.pace_feature import PaceFeature
-
-from langchain_core.pydantic_v1 import Field, BaseModel, create_model
-
-from writing_feature_extractor.features.graph_mode import (
-    GraphMode,
 )
 from writing_feature_extractor.features.descriptive_detail_level import (
     DescriptiveDetailLevelFeature,
 )
+from writing_feature_extractor.features.emotional_intensity_feature import (
+    EmotionalIntensityFeature,
+)
+from writing_feature_extractor.features.graph_mode import GraphMode
 from writing_feature_extractor.features.humor_level import HumorLevelFeature
-from writing_feature_extractor.features.romance_level import RomanceLevelFeature
 from writing_feature_extractor.features.level_of_suspense import LevelOfSuspenseFeature
+from writing_feature_extractor.features.mood_feature import MoodFeature
+from writing_feature_extractor.features.mystery_level_feature import MysteryLevelFeature
+from writing_feature_extractor.features.pace_feature import PaceFeature
+from writing_feature_extractor.features.romance_level import RomanceLevelFeature
+from writing_feature_extractor.features.writing_feature import WritingFeature
 
 
 class WritingFeatureFactory:

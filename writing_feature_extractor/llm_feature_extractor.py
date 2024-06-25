@@ -1,26 +1,28 @@
 import argparse
 import traceback
+
 import yaml
-from writing_feature_extractor.logger_config import logger
 from dotenv import load_dotenv
 
-from writing_feature_extractor.utils.text_metrics import get_text_statistics
-from writing_feature_extractor.utils.text_metrics import combine_short_strings
-from writing_feature_extractor.figure_plotter import get_graph
-
-from writing_feature_extractor.features.writing_feature_factory import (
-    WritingFeatureFactory,
-)
+from writing_feature_extractor.available_models import AvailableModels
+from writing_feature_extractor.feature_config import load_feature_config
 from writing_feature_extractor.features.available_writing_features import (
     AvailableWritingFeatures,
 )
-from writing_feature_extractor.features.writing_feature import WritingFeature
-from writing_feature_extractor.model_factory import ModelFactory
-from writing_feature_extractor.available_models import AvailableModels
 from writing_feature_extractor.features.graph_mode import GraphMode
-from writing_feature_extractor.save_results_to_csv import save_results_to_csv
+from writing_feature_extractor.features.writing_feature import WritingFeature
+from writing_feature_extractor.features.writing_feature_factory import (
+    WritingFeatureFactory,
+)
+from writing_feature_extractor.figure_plotter import get_graph
 from writing_feature_extractor.generate_graph_from_csv import generate_graph_from_csv
-from writing_feature_extractor.feature_config import load_feature_config
+from writing_feature_extractor.logger_config import logger
+from writing_feature_extractor.model_factory import ModelFactory
+from writing_feature_extractor.save_results_to_csv import save_results_to_csv
+from writing_feature_extractor.utils.text_metrics import (
+    combine_short_strings,
+    get_text_statistics,
+)
 
 SECTION_DELIMETER = "***"
 

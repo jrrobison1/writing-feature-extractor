@@ -1,7 +1,9 @@
-import pandas as pd
+import json
+
 import matplotlib.pyplot as plt
 import numpy as np
-import json
+import pandas as pd
+
 from writing_feature_extractor.logger_config import logger
 
 
