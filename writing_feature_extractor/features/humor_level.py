@@ -1,8 +1,8 @@
 from enum import Enum
 from langchain_core.pydantic_v1 import BaseModel, Field
 
-from features.graph_mode import GraphMode
-from features.writing_feature import WritingFeature
+from writing_feature_extractor.features.graph_mode import GraphMode
+from writing_feature_extractor.features.writing_feature import WritingFeature
 
 
 class HumorLevelFeature(WritingFeature):

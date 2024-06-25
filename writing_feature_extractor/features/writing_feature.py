@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from features.graph_mode import GraphMode
+from writing_feature_extractor.features.graph_mode import GraphMode
 
 
 class WritingFeature(ABC):

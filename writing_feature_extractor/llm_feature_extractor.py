@@ -1,11 +1,9 @@
-import sys
 import argparse
 import traceback
 import yaml
 from writing_feature_extractor.logger_config import logger
 from dotenv import load_dotenv
 
-from writing_feature_extractor.prompt_templates.basic_prompt import prompt_template
 from writing_feature_extractor.utils.text_metrics import get_text_statistics
 from writing_feature_extractor.utils.text_metrics import combine_short_strings
 from writing_feature_extractor.figure_plotter import get_graph
@@ -94,11 +92,9 @@ def extract_features(sections: list[str], mode: str, feature_collectors, llm):
                 if mode == "paragraph":
                     paragraphs = section.split("\n")
                     paragraphs = combine_short_strings(paragraphs)
-                    logger.info("-----SECTION BEGIN-----")
                     for paragraph in paragraphs:
                         process_text(paragraph, feature_collectors, llm)
                         text_units.append(paragraph)
-                    logger.info("-----SECTION END-----")
                     logger.info("Saving results to CSV...")
                     save_results_to_csv(
                         feature_collectors, text_units, "paragraphs.csv"

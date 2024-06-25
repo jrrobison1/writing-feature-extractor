@@ -2,7 +2,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 import json
-from logger_config import logger
+from writing_feature_extractor.logger_config import logger
 
 
 def generate_graph_from_csv(filename: str, bar_feature: str, color_feature: str):

@@ -9,8 +9,8 @@ from langchain_openai import ChatOpenAI
 from pydantic import BaseModel
 from langchain_core.prompts import PromptTemplate
 
-from available_models import AvailableModels
-from prompt_templates.basic_prompt import prompt_template
+from writing_feature_extractor.available_models import AvailableModels
+from writing_feature_extractor.prompt_templates.basic_prompt import prompt_template
 
 
 class ModelFactory:

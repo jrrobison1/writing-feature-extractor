@@ -2,8 +2,8 @@ from abc import abstractmethod
 from enum import Enum
 from langchain_core.pydantic_v1 import BaseModel, Field
 
-from features.writing_feature import WritingFeature
-from features.graph_mode import GraphMode
+from writing_feature_extractor.features.writing_feature import WritingFeature
+from writing_feature_extractor.features.graph_mode import GraphMode
 
 
 class EmotionalIntensityFeature(WritingFeature):

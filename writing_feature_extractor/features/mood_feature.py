@@ -1,7 +1,7 @@
 from enum import Enum
 
-from features.writing_feature import WritingFeature
-from features.graph_mode import GraphMode
+from writing_feature_extractor.features.writing_feature import WritingFeature
+from writing_feature_extractor.features.graph_mode import GraphMode
 
 
 class MoodFeature(WritingFeature):

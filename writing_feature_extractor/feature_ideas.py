@@ -1,8 +1,8 @@
 from enum import Enum
 from typing import List
 from langchain_core.pydantic_v1 import BaseModel, Field
-from features.pace_feature import PaceFeature
-from features.mood_feature import MoodFeature
+from writing_feature_extractor.features.pace_feature import PaceFeature
+from writing_feature_extractor.features.mood_feature import MoodFeature
 
 
 class NarrativeRichPace(str, Enum):
