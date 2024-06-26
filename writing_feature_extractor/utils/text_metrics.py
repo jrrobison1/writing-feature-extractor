@@ -1,6 +1,8 @@
 import re
 import textstat
-from writing_feature_extractor.logger_config import logger
+from writing_feature_extractor.logger_config import get_logger
+
+logger = get_logger(__name__)
 
 
 def calculate_dialogue_percentage(text: str):
