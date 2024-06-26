@@ -4,6 +4,10 @@ import traceback
 import yaml
 from dotenv import load_dotenv
 
+from langchain_core.pydantic_v1 import BaseModel
+from langchain_core.runnables import Runnable
+from langchain_core.language_models import LanguageModelInput
+
 from writing_feature_extractor.available_models import AvailableModels
 from writing_feature_extractor.feature_config import load_feature_config
 from writing_feature_extractor.features.available_writing_features import (
@@ -27,7 +31,11 @@ from writing_feature_extractor.utils.text_metrics import (
 SECTION_DELIMETER = "***"
 
 
-def process_text(text: str, feature_collectors: list[WritingFeature], llm):
+def process_text(
+    text: str,
+    feature_collectors: list[WritingFeature],
+    llm: Runnable[LanguageModelInput, BaseModel],
+):
     """Run LLM on a text to perform feature extraction"""
     try:
         result = llm.invoke(input=text)
@@ -47,13 +55,20 @@ def process_text(text: str, feature_collectors: list[WritingFeature], llm):
         feature.add_result(result_dict[feature.get_pydantic_feature_label()])
 
 
-def process_paragraph(paragraph: str, feature_collectors: list[WritingFeature], llm):
+def process_paragraph(
+    paragraph: str,
+    feature_collectors: list[WritingFeature],
+    llm: Runnable[LanguageModelInput, BaseModel],
+):
     """Process a single paragraph"""
     process_text(paragraph, feature_collectors, llm)
 
 
 def process_section(
-    section: str, mode: str, feature_collectors: list[WritingFeature], llm
+    section: str,
+    mode: str,
+    feature_collectors: list[WritingFeature],
+    llm: Runnable[LanguageModelInput, BaseModel],
 ):
     """Process a 'section' of text based on the analysis mode"""
     print(f"----------SECTION BEGIN----------")
@@ -82,7 +97,12 @@ def process_section(
     print(f"----------SECTION END----------\n\n")
 
 
-def extract_features(sections: list[str], mode: str, feature_collectors, llm):
+def extract_features(
+    sections: list[str],
+    mode: str,
+    feature_collectors: list[WritingFeature],
+    llm: Runnable[LanguageModelInput, BaseModel],
+):
     """Extract features from the text and display them in a graph."""
     try:
         for feature in feature_collectors:
@@ -125,7 +145,7 @@ def extract_features(sections: list[str], mode: str, feature_collectors, llm):
         return None
 
 
-def load_feature_config(config_file):
+def load_feature_config(config_file: str):
     with open(config_file, "r") as file:
         config = yaml.safe_load(file)
 
@@ -166,7 +186,7 @@ def main():
     )
     parser.add_argument(
         "--config",
-        default="features_config.yaml",
+        default="feature_config.yaml",
         help="YAML configuration file for features",
     )
 

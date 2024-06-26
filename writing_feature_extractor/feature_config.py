@@ -6,7 +6,7 @@ from writing_feature_extractor.features.available_writing_features import (
 from writing_feature_extractor.features.graph_mode import GraphMode
 
 
-def load_feature_config(config_file):
+def load_feature_config(config_file: str):
     with open(config_file, "r") as file:
         config = yaml.safe_load(file)
 

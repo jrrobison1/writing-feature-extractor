@@ -7,7 +7,9 @@ from langchain_core.prompts import PromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_groq import ChatGroq
 from langchain_openai import ChatOpenAI
-from pydantic import BaseModel
+from langchain_core.pydantic_v1 import BaseModel
+from langchain_core.runnables import Runnable
+from langchain_core.language_models import LanguageModelInput
 
 from writing_feature_extractor.available_models import AvailableModels
 from writing_feature_extractor.prompt_templates.basic_prompt import prompt_template
@@ -17,7 +19,9 @@ class ModelFactory:
     """Factory for creating instances of large language models"""
 
     @staticmethod
-    def get_llm_model(model: AvailableModels, PydanticModel: type[BaseModel]):
+    def get_llm_model(
+        model: AvailableModels, PydanticModel: type[BaseModel]
+    ) -> Runnable[LanguageModelInput, BaseModel]:
         """Get a language model based on the model type and a pydantic model representing
         the structured output of the model."""
 
