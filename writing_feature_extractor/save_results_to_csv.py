@@ -8,11 +8,13 @@ from writing_feature_extractor.logger_config import get_logger
 
 logger = get_logger(__name__)
 
+DEFAULT_CSV_FILE = "feature_results.csv"
+
 
 def save_results_to_csv(
     feature_collectors: List[WritingFeature],
     text_units: List[str],
-    filename: str = "feature_results.csv",
+    filename: str = DEFAULT_CSV_FILE,
 ):
     """
     Save the results of all features to a CSV file.

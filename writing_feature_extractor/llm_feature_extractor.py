@@ -31,6 +31,7 @@ from writing_feature_extractor.utils.text_metrics import (
 logger = get_logger(__name__)
 
 SECTION_DELIMETER = "***"
+DEFAULT_CSV_FILE = "feature_results.csv"
 
 
 def process_text(
@@ -121,7 +122,8 @@ def extract_features(
                         text_units.append(paragraph)
                     logger.info("Saving results to CSV...")
                     save_results_to_csv(
-                        feature_collectors, text_units, "paragraphs.csv"
+                        feature_collectors,
+                        text_units,
                     )
                     input("Press Enter to continue...")
 
@@ -184,7 +186,7 @@ def main():
     )
     parser.add_argument(
         "--csv-file",
-        default="feature_results.csv",
+        default=DEFAULT_CSV_FILE,
         help="CSV file to save results to or read from",
     )
     parser.add_argument(
