@@ -4,7 +4,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from writing_feature_extractor.logger_config import logger
+from writing_feature_extractor.logger_config import get_logger
+
+logger = get_logger(__name__)
 
 
 def generate_graph_from_csv(filename: str, bar_feature: str, color_feature: str):

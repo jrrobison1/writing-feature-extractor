@@ -20,13 +20,15 @@ from writing_feature_extractor.features.writing_feature_factory import (
 )
 from writing_feature_extractor.figure_plotter import get_graph
 from writing_feature_extractor.generate_graph_from_csv import generate_graph_from_csv
-from writing_feature_extractor.logger_config import logger
+from writing_feature_extractor.logger_config import get_logger
 from writing_feature_extractor.model_factory import ModelFactory
 from writing_feature_extractor.save_results_to_csv import save_results_to_csv
 from writing_feature_extractor.utils.text_metrics import (
     combine_short_strings,
     get_text_statistics,
 )
+
+logger = get_logger(__name__)
 
 SECTION_DELIMETER = "***"
 

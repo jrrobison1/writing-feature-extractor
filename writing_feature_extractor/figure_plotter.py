@@ -6,7 +6,9 @@ import pandas as pd
 
 from writing_feature_extractor.features.graph_mode import GraphMode
 from writing_feature_extractor.features.writing_feature import WritingFeature
-from writing_feature_extractor.logger_config import logger
+from writing_feature_extractor.logger_config import get_logger
+
+logger = get_logger(__name__)
 
 
 def bar_and_color_features(
