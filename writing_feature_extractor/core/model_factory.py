@@ -10,7 +10,7 @@ from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_groq import ChatGroq
 from langchain_openai import ChatOpenAI
 
-from writing_feature_extractor.available_models import AvailableModels
+from writing_feature_extractor.core.available_models import AvailableModels
 from writing_feature_extractor.prompt_templates.basic_prompt import prompt_template
 
 

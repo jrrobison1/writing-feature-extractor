@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-from writing_feature_extractor.logger_config import get_logger
+from writing_feature_extractor.utils.logger_config import get_logger
 
 logger = get_logger(__name__)
 

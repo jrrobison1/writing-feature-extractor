@@ -4,7 +4,7 @@ import traceback
 from typing import List
 
 from writing_feature_extractor.features.writing_feature import WritingFeature
-from writing_feature_extractor.logger_config import get_logger
+from writing_feature_extractor.utils.logger_config import get_logger
 
 logger = get_logger(__name__)
 
