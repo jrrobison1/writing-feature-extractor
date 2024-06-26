@@ -49,7 +49,6 @@ class MoodFeature(WritingFeature):
         return "Mood"
 
     def get_int_for_enum(self, typ: type):
-        print(f"Trying to get int for {typ}")
         raise NotImplemented("MoodFeature is available only in colors")
 
     def add_result(self, enum_value):

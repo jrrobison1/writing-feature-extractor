@@ -7,6 +7,7 @@ from writing_feature_extractor.features.graph_mode import GraphMode
 
 
 def load_feature_config(config_file: str):
+    """Load feature configuration from a YAML file."""
     with open(config_file, "r") as file:
         config = yaml.safe_load(file)
 

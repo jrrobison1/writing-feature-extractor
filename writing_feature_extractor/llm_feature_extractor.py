@@ -71,7 +71,7 @@ def process_section(
     llm: Runnable[LanguageModelInput, BaseModel],
 ):
     """Process a 'section' of text based on the analysis mode"""
-    print(f"----------SECTION BEGIN----------")
+    logger.info(f"----------SECTION BEGIN----------")
 
     if mode == "paragraph":
         for feature in feature_collectors:
@@ -94,7 +94,7 @@ def process_section(
     elif mode == "section":
         process_text(section, feature_collectors, llm)
 
-    print(f"----------SECTION END----------\n\n")
+    logger.info(f"----------SECTION END----------\n\n")
 
 
 def extract_features(
@@ -146,6 +146,7 @@ def extract_features(
 
 
 def load_feature_config(config_file: str):
+    """Load feature configuration from a YAML file."""
     with open(config_file, "r") as file:
         config = yaml.safe_load(file)
 
