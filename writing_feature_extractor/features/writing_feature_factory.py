@@ -53,15 +53,17 @@ class WritingFeatureFactory:
             else:
                 raise ValueError(f"Feature {feature} is not supported.")
 
-            selected_features[current_feature.get_pydantic_feature_label()] = (
-                current_feature.get_pydantic_feature_type(),
+            print(f"Adding feature: [{current_feature.pydantic_feature_label}]")
+            selected_features[current_feature.pydantic_feature_label] = (
+                current_feature.pydantic_feature_type,
                 Field(
                     ...,
-                    description=current_feature.get_pydantic_docstring(),
+                    description=current_feature.pydantic_docstring,
                 ),
             )
 
             feature_collectors.append(current_feature)
+
         DynamicFeatureModel = create_model(
             "DynamicFeatureModel",
             __doc__="Features contained in the creative writing text",

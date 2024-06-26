@@ -21,16 +21,20 @@ class MoodFeature(WritingFeature):
         SUSPENSEFUL = "suspenseful"
         NEUTRAL = "neutral"
 
-    def get_pydantic_feature_label(self):
+    @property
+    def pydantic_feature_label(self):
         return "mood"
 
-    def get_pydantic_feature_type(self):
-        return MoodFeature.Mood
+    @property
+    def pydantic_feature_type(self):
+        return self.Mood
 
-    def get_pydantic_docstring(self):
+    @property
+    def pydantic_docstring(self):
         return "Mood of the text. The mood MUST be one of these selections. If the mood is not listed, choose the closest semantic match.."
 
-    def get_graph_colors(self):
+    @property
+    def graph_colors(self):
         return {
             "positive": "#FFFF00",
             "sad": "#00008B",
@@ -39,13 +43,16 @@ class MoodFeature(WritingFeature):
             "neutral": "#D3D3D3",
         }
 
-    def get_graph_y_tick_labels(self):
+    @property
+    def graph_y_tick_labels(self):
         raise NotImplemented("MoodFeature is available only in colors")
 
-    def get_graph_y_ticks(self):
+    @property
+    def graph_y_ticks(self):
         raise NotImplemented("MoodFeature is available only in colors")
 
-    def get_y_level_label(self):
+    @property
+    def y_level_label(self):
         return "Mood"
 
     def get_int_for_enum(self, typ: type):
@@ -53,7 +60,3 @@ class MoodFeature(WritingFeature):
 
     def add_result(self, enum_value):
         self.results.append(enum_value)
-
-    def set_graph_mode(self, graph_mode: GraphMode):
-        self.graph_mode = graph_mode
-        return self

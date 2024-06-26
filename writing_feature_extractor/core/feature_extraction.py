@@ -35,9 +35,9 @@ def process_text(
 
     for feature in feature_collectors:
         logger.info(
-            f"Adding result [{result_dict[feature.get_pydantic_feature_label()]}] for feature: [{feature.get_pydantic_feature_label()}]"
+            f"Adding result [{result_dict[feature.pydantic_feature_label]}] for feature: [{feature.pydantic_feature_label}]"
         )
-        feature.add_result(result_dict[feature.get_pydantic_feature_label()])
+        feature.add_result(result_dict[feature.pydantic_feature_label])
 
 
 def extract_features(

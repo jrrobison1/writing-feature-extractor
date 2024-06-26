@@ -27,7 +27,7 @@ def save_results_to_csv(
         with open(filename, "w", newline="") as csvfile:
             fieldnames = (
                 ["Unit", "Text", "Length"]
-                + [fc.get_y_level_label() for fc in feature_collectors]
+                + [fc.y_level_label for fc in feature_collectors]
                 + ["ColorMaps"]
             )
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -36,14 +36,13 @@ def save_results_to_csv(
             for i, text in enumerate(text_units, 1):
                 row = {"Unit": i, "Text": text, "Length": len(text.split())}
                 for fc in feature_collectors:
-                    row[fc.get_y_level_label()] = (
+                    row[fc.y_level_label] = (
                         fc.results[i - 1] if i <= len(fc.results) else ""
                     )
 
                 # Add color maps
                 color_maps = {
-                    fc.get_y_level_label(): fc.get_graph_colors()
-                    for fc in feature_collectors
+                    fc.y_level_label: fc.graph_colors for fc in feature_collectors
                 }
                 row["ColorMaps"] = json.dumps(color_maps)
 
@@ -52,4 +51,4 @@ def save_results_to_csv(
         logger.info(f"Results saved to {filename}")
     except Exception as e:
         logger.error(f"Error saving results to CSV: {e}")
-        logger.debug(f"Error traceback: {traceback.format_exc()}")
+        logger.info(f"Error traceback: {traceback.format_exc()}")
