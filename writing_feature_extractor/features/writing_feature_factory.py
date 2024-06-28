@@ -1,4 +1,4 @@
-from typing import Tuple
+from typing import Dict, Tuple, Type
 
 from langchain_core.pydantic_v1 import BaseModel, Field, create_model
 
@@ -29,6 +29,17 @@ class WritingFeatureFactory:
     """Factory class to create dynamic pydantic models based on the given
     writing features desired for feature extraction."""
 
+    FEATURE_MAP: Dict[AvailableWritingFeatures, Type[WritingFeature]] = {
+        AvailableWritingFeatures.PACING: PaceFeature,
+        AvailableWritingFeatures.MOOD: MoodFeature,
+        AvailableWritingFeatures.EMOTIONAL_INTENSITY: EmotionalIntensityFeature,
+        AvailableWritingFeatures.MYSTERY_LEVEL: MysteryLevelFeature,
+        AvailableWritingFeatures.DESCRIPTIVE_DETAIL_LEVEL: DescriptiveDetailLevelFeature,
+        AvailableWritingFeatures.HUMOR_LEVEL: HumorLevelFeature,
+        AvailableWritingFeatures.ROMANCE_LEVEL: RomanceLevelFeature,
+        AvailableWritingFeatures.LEVEL_OF_SUSPENSE: LevelOfSuspenseFeature,
+    }
+
     @staticmethod
     def get_dynamic_model(
         features: list[Tuple[AvailableWritingFeatures, GraphMode]],
@@ -39,24 +50,11 @@ class WritingFeatureFactory:
             selected_features = dict()
             feature_collectors = []
             for feature, graph_mode in features:
-                if feature == AvailableWritingFeatures.PACING:
-                    current_feature = PaceFeature(graph_mode)
-                elif feature == AvailableWritingFeatures.MOOD:
-                    current_feature = MoodFeature(graph_mode)
-                elif feature == AvailableWritingFeatures.EMOTIONAL_INTENSITY:
-                    current_feature = EmotionalIntensityFeature(graph_mode)
-                elif feature == AvailableWritingFeatures.MYSTERY_LEVEL:
-                    current_feature = MysteryLevelFeature(graph_mode)
-                elif feature == AvailableWritingFeatures.DESCRIPTIVE_DETAIL_LEVEL:
-                    current_feature = DescriptiveDetailLevelFeature(graph_mode)
-                elif feature == AvailableWritingFeatures.HUMOR_LEVEL:
-                    current_feature = HumorLevelFeature(graph_mode)
-                elif feature == AvailableWritingFeatures.ROMANCE_LEVEL:
-                    current_feature = RomanceLevelFeature(graph_mode)
-                elif feature == AvailableWritingFeatures.LEVEL_OF_SUSPENSE:
-                    current_feature = LevelOfSuspenseFeature(graph_mode)
-                else:
+                feature_class = WritingFeatureFactory.FEATURE_MAP.get(feature)
+                if feature_class is None:
                     raise ValueError(f"Feature {feature} is not supported.")
+
+                current_feature = feature_class(graph_mode)
 
                 logger.info(
                     f"Adding feature: [{current_feature.pydantic_feature_label}] to the dynamic model"
