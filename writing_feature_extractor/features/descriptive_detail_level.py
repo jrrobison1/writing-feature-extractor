@@ -29,6 +29,10 @@ class DescriptiveDetailLevelFeature(WritingFeature):
         }
 
     @property
+    def pydantic_feature_label(self):
+        return "descriptive_detail_level"
+
+    @property
     def pydantic_feature_type(self):
         return self.DescriptiveDetailLevel
 

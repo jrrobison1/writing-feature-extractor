@@ -4,7 +4,7 @@ from writing_feature_extractor.utils.logger_config import get_logger
 from writing_feature_extractor.utils.text_metrics import combine_short_strings
 
 SECTION_DELIMITER = "***"
-logger = get_logger()
+logger = get_logger(__name__)
 
 
 def load_text(file_path: str) -> str:
