@@ -35,6 +35,8 @@ def main():
 
 
 def handle_feature_extraction(args):
+    """Handle feature extraction from the input text."""
+
     text = load_text(args.file)
     features = load_feature_config(args.config)
 
@@ -55,6 +57,8 @@ def handle_feature_extraction(args):
 
 
 def handle_graph_generation(args):
+    """Handle graph generation from a saved CSV file."""
+
     if not (args.bar_feature and args.color_feature):
         logger.error(
             "Please specify --bar-feature and --color-feature when using --graph"

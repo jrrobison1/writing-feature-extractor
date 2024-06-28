@@ -11,7 +11,11 @@ from langchain_groq import ChatGroq
 from langchain_openai import ChatOpenAI
 
 from writing_feature_extractor.core.available_models import AvailableModels
+from writing_feature_extractor.core.custom_exceptions import ModelError
 from writing_feature_extractor.prompt_templates.basic_prompt import prompt_template
+from writing_feature_extractor.utils.logger_config import get_logger
+
+logger = get_logger(__name__)
 
 
 class ModelFactory:
@@ -19,56 +23,85 @@ class ModelFactory:
     def create_openai_model(
         model_name: str, PydanticModel: type[BaseModel]
     ) -> Runnable[LanguageModelInput, BaseModel]:
-        return prompt_template | ChatOpenAI(
-            model=model_name, temperature=0
-        ).with_structured_output(PydanticModel)
+        try:
+            return prompt_template | ChatOpenAI(
+                model=model_name, temperature=0
+            ).with_structured_output(PydanticModel)
+        except Exception as e:
+            logger.error(f"Error creating OpenAI model: {e}")
+            logger.debug("Error details:", exc_info=True)
+            raise ModelError("Failed to create OpenAI model.") from e
 
     @staticmethod
     def create_anthropic_model(
         model_name: str, PydanticModel: type[BaseModel]
     ) -> Runnable[LanguageModelInput, BaseModel]:
-        return prompt_template | ChatAnthropic(
-            model=model_name, temperature=0
-        ).with_structured_output(PydanticModel)
+        try:
+            return prompt_template | ChatAnthropic(
+                model=model_name, temperature=0
+            ).with_structured_output(PydanticModel)
+        except Exception as e:
+            logger.error(f"Error creating Anthropic model: {e}")
+            logger.debug("Error details:", exc_info=True)
+            raise ModelError("Failed to create Anthropic model.") from e
 
     @staticmethod
     def create_groq_model(
         model_name: str, PydanticModel: type[BaseModel]
     ) -> Runnable[LanguageModelInput, BaseModel]:
-        return prompt_template | ChatGroq(
-            model_name=model_name, temperature=0
-        ).with_structured_output(PydanticModel)
+        try:
+            return prompt_template | ChatGroq(
+                model_name=model_name, temperature=0
+            ).with_structured_output(PydanticModel)
+        except Exception as e:
+            logger.error(f"Error creating Groq model: {e}")
+            logger.debug("Error details:", exc_info=True)
+            raise ModelError("Failed to create Groq model.") from e
 
     @staticmethod
     def create_gemini_model(
         model_name: str, PydanticModel: type[BaseModel]
     ) -> Runnable[LanguageModelInput, BaseModel]:
-        parser = PydanticOutputParser(pydantic_object=PydanticModel)
-        prompt = PromptTemplate(
-            template="Extract features from the following creative writing.\n{format_instructions}\n{input}\n",
-            input_variables=["input"],
-            partial_variables={"format_instructions": parser.get_format_instructions()},
-        )
-        llm = ChatGoogleGenerativeAI(model=model_name, temperature=0)
-        return prompt | llm | parser
+        try:
+            parser = PydanticOutputParser(pydantic_object=PydanticModel)
+            prompt = PromptTemplate(
+                template="Extract features from the following creative writing.\n{format_instructions}\n{input}\n",
+                input_variables=["input"],
+                partial_variables={
+                    "format_instructions": parser.get_format_instructions()
+                },
+            )
+            llm = ChatGoogleGenerativeAI(model=model_name, temperature=0)
+            return prompt | llm | parser
+        except Exception as e:
+            logger.error(f"Error creating Google Gemini model: {e}")
+            logger.debug("Error details:", exc_info=True)
+            raise ModelError("Failed to create Google Gemini model.") from e
 
     @staticmethod
     def create_together_model(
         model_name: str, PydanticModel: type[BaseModel]
     ) -> Runnable[LanguageModelInput, BaseModel]:
-        parser = PydanticOutputParser(pydantic_object=PydanticModel)
-        prompt = PromptTemplate(
-            template="Extract features from the following creative writing.\n{format_instructions}\n{input}\n",
-            input_variables=["input"],
-            partial_variables={"format_instructions": parser.get_format_instructions()},
-        )
-        model = ChatOpenAI(
-            base_url="https://api.together.xyz/v1",
-            api_key=os.environ["TOGETHER_API_KEY"],
-            model=model_name,
-            temperature=0,
-        )
-        return prompt | model | parser
+        try:
+            parser = PydanticOutputParser(pydantic_object=PydanticModel)
+            prompt = PromptTemplate(
+                template="Extract features from the following creative writing.\n{format_instructions}\n{input}\n",
+                input_variables=["input"],
+                partial_variables={
+                    "format_instructions": parser.get_format_instructions()
+                },
+            )
+            model = ChatOpenAI(
+                base_url="https://api.together.xyz/v1",
+                api_key=os.environ["TOGETHER_API_KEY"],
+                model=model_name,
+                temperature=0,
+            )
+            return prompt | model | parser
+        except Exception as e:
+            logger.error(f"Error creating Together.ai model: {e}")
+            logger.debug("Error details:", exc_info=True)
+            raise ModelError("Failed to create Together.ai model.") from e
 
     MODEL_CREATORS: Dict[AvailableModels, Callable] = {
         AvailableModels.GPT_3_5: lambda PydanticModel: ModelFactory.create_openai_model(

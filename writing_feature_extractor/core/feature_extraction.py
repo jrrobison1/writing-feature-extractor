@@ -27,7 +27,10 @@ def process_text(
         logger.info(f"LLM Result: [{str(result)}]")
     except Exception as e:
         logger.error("Error invoking the LLM", e)
-        logger.debug(traceback.format_exc())
+        logger.debug(
+            f"Error invoking the LLM with text: {text},  llm: {llm}, text: {text}",
+            exc_info=True,
+        )
         return
 
     result_dict = result.dict()

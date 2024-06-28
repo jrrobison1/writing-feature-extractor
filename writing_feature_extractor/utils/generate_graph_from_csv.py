@@ -4,6 +4,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
+from writing_feature_extractor.core.custom_exceptions import (
+    FileOperationError,
+    GraphError,
+)
 from writing_feature_extractor.utils.logger_config import get_logger
 
 logger = get_logger(__name__)
@@ -114,8 +118,15 @@ def generate_graph_from_csv(filename: str, bar_feature: str, color_feature: str)
         output_filename = f"{bar_feature}_{color_feature}_graph.png"
         plt.savefig(output_filename, dpi=300)
         logger.info(f"Graph saved as {output_filename}")
+    except FileNotFoundError as fnfe:
+        logger.error(f"File not found: {filename}, {fnfe}")
+        logger.debug("Error details:", exc_info=True)
+        raise FileOperationError(f"File not found: {filename}")
+    except OSError as ose:
+        logger.error(f"An OS Error occurred: {filename}, {ose}")
+        logger.debug("Error details:", exc_info=True)
+        raise FileOperationError(f"File not found: {filename}")
     except Exception as e:
         logger.error(f"Error generating graph from CSV: {e}")
-        import traceback
-
-        logger.debug(f"Error traceback: {traceback.format_exc()}")
+        logger.debug("Error details:", exc_info=True)
+        raise GraphError("Failed to generate graph from the given CSV file.") from e

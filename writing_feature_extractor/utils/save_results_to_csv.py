@@ -3,6 +3,7 @@ import json
 import traceback
 from typing import List
 
+from writing_feature_extractor.core.custom_exceptions import FileOperationError
 from writing_feature_extractor.features.writing_feature import WritingFeature
 from writing_feature_extractor.utils.logger_config import get_logger
 
@@ -51,4 +52,5 @@ def save_results_to_csv(
         logger.info(f"Results saved to {filename}")
     except Exception as e:
         logger.error(f"Error saving results to CSV: {e}")
-        logger.info(f"Error traceback: {traceback.format_exc()}")
+        logger.debug("Error details:", exc_info=True)
+        raise FileOperationError(f"Failed to save results to {filename}.") from e
