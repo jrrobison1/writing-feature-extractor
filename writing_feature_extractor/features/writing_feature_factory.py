@@ -48,7 +48,8 @@ class WritingFeatureFactory:
             Tuple[
                 AvailableWritingFeatures | str,
                 GraphMode,
-                dict[str, list[str] | dict[str, str]],
+                list[str],
+                dict[str, str],
             ]
         ],
     ) -> Tuple[type[BaseModel], list[WritingFeature]]:
@@ -57,14 +58,14 @@ class WritingFeatureFactory:
         try:
             selected_features = dict()
             feature_collectors = []
-            for feature, graph_mode, feature_customizations in features:
+            for feature, graph_mode, levels, color_map in features:
 
                 feature_class = WritingFeatureFactory.FEATURE_MAP.get(feature)
                 if feature_class is None:
                     current_feature = WritingFeatureFactory.create_generic_feature(
                         feature,
-                        feature_customizations["levels"],
-                        feature_customizations["color_map"],
+                        levels,
+                        color_map,
                         GraphMode(graph_mode),
                     )
                 else:

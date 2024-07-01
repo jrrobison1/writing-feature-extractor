@@ -12,23 +12,26 @@ logger = get_logger(__name__)
 
 def load_feature_config(
     config_file: str,
-) -> list[tuple[AvailableWritingFeatures, GraphMode, dict[str, str]]]:
+) -> list[tuple[AvailableWritingFeatures, GraphMode, list[str], dict[str, str]]]:
     """Load feature configuration from a YAML file."""
     try:
         with open(config_file, "r") as file:
             config = yaml.safe_load(file)
 
         features = []
-        feature_customizations = {}
+        levels = []
+        color_map = {}
         for feature in config["features"]:
             if hasattr(AvailableWritingFeatures, feature["name"]) is True:
                 feature_name = getattr(AvailableWritingFeatures, feature["name"])
             else:
                 feature_name = feature["name"]
                 feature_customizations = feature["customizations"]
+                levels = feature_customizations["levels"]
+                color_map = feature_customizations["color_map"]
 
             graph_mode = getattr(GraphMode, feature["graph_mode"])
-            features.append((feature_name, graph_mode, feature_customizations))
+            features.append((feature_name, graph_mode, levels, color_map))
 
         return features
     except Exception as e:
