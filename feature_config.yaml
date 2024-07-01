@@ -11,3 +11,16 @@ features:
     graph_mode: SAVE_ONLY
   - name: LEVEL_OF_SUSPENSE
     graph_mode: SAVE_ONLY
+  - name: "Smell Sensory Detail Level"
+    graph_mode: SAVE_ONLY
+    customizations:
+      levels:
+        - "none"
+        - "low"
+        - "medium"
+        - "high"
+      color_map:
+        "0": "#FFFFFF"
+        "1": "#CC99CC"
+        "2": "#CC99CC"
+        "3": "#800080"

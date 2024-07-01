@@ -64,7 +64,7 @@ class WritingFeatureFactory:
                     current_feature = WritingFeatureFactory.create_generic_feature(
                         feature,
                         feature_customizations["levels"],
-                        feature_customizations["colors"],
+                        feature_customizations["color_map"],
                         GraphMode(graph_mode),
                     )
                 else:
