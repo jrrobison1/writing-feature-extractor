@@ -34,6 +34,11 @@ def combine_short_strings(
     This is useful for pieces of text that are too small for an LLM to make inference
     for feature extraction"""
 
+    for string in strings:
+        if len(string) == 0:
+            logger.info("Removing empty string from list of strings")
+            strings.remove(string)
+
     try:
         i = 0
         while i < len(strings) - 1:

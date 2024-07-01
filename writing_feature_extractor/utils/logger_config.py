@@ -18,8 +18,8 @@ def get_logger(module_name: str) -> logging.Logger:
         stream_handler = logging.StreamHandler(sys.stdout)
 
         # Set logging levels for handlers
-        file_handler.setLevel(logging.INFO)
-        stream_handler.setLevel(logging.INFO)
+        file_handler.setLevel(logging.DEBUG)
+        stream_handler.setLevel(logging.DEBUG)
 
         # Create formatters
         file_formatter = logging.Formatter(

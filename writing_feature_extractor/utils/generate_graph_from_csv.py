@@ -29,6 +29,16 @@ def generate_graph_from_csv(filename: str, bar_feature: str, color_feature: str)
         color_maps = json.loads(df["ColorMaps"].iloc[0])
         color_dict = color_maps[color_feature]
 
+        logger.debug(f"Color maps: {color_maps}")
+        logger.debug(f"Color dictionary for {color_feature}: {color_dict}")
+
+        logger.debug(f"Unique values in {color_feature}: {df[color_feature].unique()}")
+
+        bar_colors = [
+            color_dict.get(str(val).lower(), "#CCCCCC") for val in df[color_feature]
+        ]
+        logger.debug(f"Bar colors: {bar_colors}")
+
         # Create the plot
         fig, ax = plt.subplots(figsize=(15, 8))
 

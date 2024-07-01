@@ -11,13 +11,9 @@ class EmotionalIntensityFeature(WritingFeature):
         """Strength or intensity of emotions expressed in the text. Can be 'none', 'very low', 'low', 'medium low', 'medium', 'medium high', 'high', or 'very high'."""
 
         NONE = "none"
-        VERY_LOW = "very low"
         LOW = "low"
-        MEDIUM_LOW = "medium low"
         MEDIUM = "medium"
-        MEDIUM_HIGH = "medium high"
         HIGH = "high"
-        VERY_HIGH = "very high"
 
     @property
     def y_level_label(self):
@@ -39,11 +35,7 @@ class EmotionalIntensityFeature(WritingFeature):
     def graph_colors(self) -> dict[str, str]:
         return {
             "0": "#FFFFFF",
-            "1": "#FFCCCC",
-            "2": "#FF9999",
-            "3": "#FF6666",
-            "4": "#FF3333",
-            "5": "#FF0000",
-            "6": "#CC0000",
-            "7": "#990000",
+            "1": "#FF9999",
+            "2": "#FF3333",
+            "3": "#CC0000",
         }
