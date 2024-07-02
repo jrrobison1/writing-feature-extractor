@@ -1,5 +1,3 @@
-import traceback
-
 from langchain_core.language_models import LanguageModelInput
 from langchain_core.pydantic_v1 import BaseModel
 from langchain_core.runnables import Runnable
@@ -7,7 +5,6 @@ from langchain_core.runnables import Runnable
 from writing_feature_extractor.features.writing_feature import WritingFeature
 from writing_feature_extractor.utils.logger_config import get_logger
 from writing_feature_extractor.utils.save_results_to_csv import save_results_to_csv
-from writing_feature_extractor.utils.text_processing import split_into_paragraphs
 from writing_feature_extractor.utils.text_metrics import (
     combine_short_strings,
     get_text_statistics,

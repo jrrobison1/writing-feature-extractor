@@ -1,6 +1,5 @@
 import csv
 import json
-import traceback
 from typing import List
 
 from writing_feature_extractor.core.custom_exceptions import FileOperationError
