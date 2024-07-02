@@ -44,16 +44,18 @@ def handle_feature_extraction(args):
         features
     )
 
-    llm = ModelFactory.get_llm_model(AvailableModels.GPT_3_5, DynamicFeatureModel)
+    llm = ModelFactory.get_llm_model(AvailableModels.CLAUDE_HAIKU, DynamicFeatureModel)
     logger.debug(f"Obtained LLM model: {llm}")
 
     sections = split_into_sections(text)
     result = extract_features(sections, args.mode, feature_collectors, llm)
 
     if result:
-        feature_collectors, text_units = result
+        feature_collectors, text_units, text_metrics = result
         if args.save:
-            save_results_to_csv(feature_collectors, text_units, args.csv_file)
+            save_results_to_csv(
+                feature_collectors, text_metrics, text_units, args.csv_file
+            )
 
 
 def handle_graph_generation(args):

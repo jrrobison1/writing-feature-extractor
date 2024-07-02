@@ -1,6 +1,6 @@
 import csv
 import json
-from typing import List
+from typing import Any, List
 
 from writing_feature_extractor.core.custom_exceptions import FileOperationError
 from writing_feature_extractor.features.writing_feature import WritingFeature
@@ -13,6 +13,7 @@ DEFAULT_CSV_FILE = "feature_results.csv"
 
 def save_results_to_csv(
     feature_collectors: List[WritingFeature],
+    text_metrics: list[dict[str, Any]],
     text_units: List[str],
     filename: str = DEFAULT_CSV_FILE,
 ):
@@ -26,19 +27,23 @@ def save_results_to_csv(
     try:
         with open(filename, "w", newline="") as csvfile:
             fieldnames = (
-                ["Unit", "Text", "Length"]
+                ["Unit", "Length"]
                 + [fc.y_level_label for fc in feature_collectors]
+                + [metric for metric in text_metrics[0]]
                 + ["ColorMaps"]
             )
             writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
             writer.writeheader()
             for i, text in enumerate(text_units, 1):
-                row = {"Unit": i, "Text": text, "Length": len(text.split())}
+                row = {"Unit": i, "Length": len(text.split())}
                 for fc in feature_collectors:
                     row[fc.y_level_label] = (
                         fc.results[i - 1] if i <= len(fc.results) else ""
                     )
+
+                for metric in text_metrics[0].keys():
+                    row[metric] = text_metrics[i - 1][metric]
 
                 # Add color maps
                 color_maps = {

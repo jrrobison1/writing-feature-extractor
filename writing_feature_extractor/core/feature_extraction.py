@@ -51,22 +51,27 @@ def extract_features(
         feature.results.clear()
 
     text_units = []
+    section_text_metrics = []
     for section in sections:
         if mode == "paragraph":
             paragraphs = section.split("\n")
             paragraphs = combine_short_strings(paragraphs)
+            text_metrics = []
             for paragraph in paragraphs:
                 process_text(paragraph, feature_collectors, llm)
+                text_metrics.append(get_text_statistics(paragraph))
                 text_units.append(paragraph)
             logger.info("Saving results to CSV...")
             save_results_to_csv(
                 feature_collectors,
+                text_metrics,
                 text_units,
             )
             input("Press Enter to continue...")
 
         elif mode == "section":
             process_text(section, feature_collectors, llm)
+            section_text_metrics.append(get_text_statistics(section))
             text_units.append(section)
 
     logger.debug(f"Number of text units processed: {len(text_units)}")
@@ -74,4 +79,4 @@ def extract_features(
         f"Number of results in each feature collector: {[len(fc.results) for fc in feature_collectors]}"
     )
 
-    return feature_collectors, text_units
+    return feature_collectors, text_units, section_text_metrics

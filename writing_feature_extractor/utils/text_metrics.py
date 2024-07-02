@@ -71,6 +71,13 @@ def get_text_statistics(text: str) -> dict[str]:
         text_statistics["readability_grade"] = textstat.flesch_kincaid_grade(text)
         text_statistics["sentence_count"] = textstat.sentence_count(text)
         text_statistics["word_count"] = textstat.lexicon_count(text, removepunct=True)
+        text_statistics["syllable_count"] = textstat.syllable_count(text)
+        text_statistics["average_words_per_sentence"] = (
+            text_statistics["word_count"] / text_statistics["sentence_count"]
+        )
+        text_statistics["average_syllables_per_word"] = (
+            text_statistics["syllable_count"] / text_statistics["word_count"]
+        )
 
         logger.debug(f"Text statistics: {text_statistics}")
         return text_statistics
