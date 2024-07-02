@@ -14,7 +14,9 @@ from writing_feature_extractor.features.emotional_intensity_feature import (
     EmotionalIntensityFeature,
 )
 from writing_feature_extractor.features.generic_feature import GenericFeature
-from writing_feature_extractor.features.graph_mode import GraphMode
+from writing_feature_extractor.features.result_collection_mode import (
+    ResultCollectionMode,
+)
 from writing_feature_extractor.features.humor_level import HumorLevelFeature
 from writing_feature_extractor.features.level_of_suspense import LevelOfSuspenseFeature
 from writing_feature_extractor.features.mood_feature import MoodFeature
@@ -47,7 +49,7 @@ class WritingFeatureFactory:
         features: list[
             Tuple[
                 AvailableWritingFeatures | str,
-                GraphMode,
+                ResultCollectionMode,
                 list[str],
                 dict[str, str],
             ]
@@ -58,7 +60,7 @@ class WritingFeatureFactory:
         try:
             selected_features = dict()
             feature_collectors = []
-            for feature, graph_mode, levels, color_map in features:
+            for feature, result_collection_mode, levels, color_map in features:
 
                 feature_class = WritingFeatureFactory.FEATURE_MAP.get(feature)
                 if feature_class is None:
@@ -66,10 +68,10 @@ class WritingFeatureFactory:
                         feature,
                         levels,
                         color_map,
-                        GraphMode(graph_mode),
+                        ResultCollectionMode(result_collection_mode),
                     )
                 else:
-                    current_feature = feature_class(graph_mode)
+                    current_feature = feature_class(result_collection_mode)
 
                 logger.info(
                     f"Adding feature: [{current_feature.pydantic_feature_label}] to the dynamic model"
@@ -103,7 +105,7 @@ class WritingFeatureFactory:
         feature_name: str,
         levels: list[str],
         colors: dict[str, str],
-        graph_mode: GraphMode,
+        result_collection_mode: ResultCollectionMode,
     ) -> GenericFeature:
         """Creates a generic writing feature based on the given feature name"""
 
@@ -117,9 +119,9 @@ class WritingFeatureFactory:
         CustomEnum = WritingFeatureFactory.create_dynamic_enum(enum_name, levels)
 
         logger.info(
-            f"Creating generic feature: [{feature_name}] with levels: [{levels}], colors: [{colors}] and graph mode: [{graph_mode}]"
+            f"Creating generic feature: [{feature_name}] with levels: [{levels}], colors: [{colors}] and graph mode: [{result_collection_mode}]"
         )
-        return GenericFeature(feature_name, CustomEnum, colors, graph_mode)
+        return GenericFeature(feature_name, CustomEnum, colors, result_collection_mode)
 
     @staticmethod
     def create_dynamic_enum(enum_name, values):

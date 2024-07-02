@@ -1,15 +1,20 @@
 from abc import ABC, abstractmethod
 from enum import Enum
 
-from writing_feature_extractor.features.graph_mode import GraphMode
+from writing_feature_extractor.features.result_collection_mode import (
+    ResultCollectionMode,
+)
 
 
 class WritingFeature(ABC):
     """Abstract base class for a 'writing feature': a feature which can be
     extracted by an LLM and be presented in a graph."""
 
-    def __init__(self, graph_mode: GraphMode = GraphMode.BAR):
-        self.graph_mode = graph_mode
+    def __init__(
+        self,
+        result_collection_mode: ResultCollectionMode = ResultCollectionMode.NUMBER_REPRESENTATION,
+    ):
+        self.result_collection_mode = result_collection_mode
         self.results: list[int] = []
 
     @property
@@ -46,9 +51,9 @@ class WritingFeature(ABC):
         these colors are used to color the bars of the graph."""
         pass
 
-    def graph_mode(self) -> GraphMode:
+    def result_collection_mode(self) -> ResultCollectionMode:
         """Set the graph mode for this feature"""
-        return self._graph_mode
+        return self.result_collection_mode
 
     @property
     def graph_y_tick_labels(self) -> list[str]:
@@ -67,11 +72,9 @@ class WritingFeature(ABC):
 
     def add_result(self, enum_value: Enum):
         """For results collection. Add a result to the results list."""
-        if self.graph_mode == GraphMode.BAR:
+        if self.result_collection_mode == ResultCollectionMode.NUMBER_REPRESENTATION:
             self.results.append(self.get_int_for_enum(enum_value))
-        elif self.graph_mode == GraphMode.COLOR:
+        elif self.result_collection_mode == ResultCollectionMode.FIELD_NAME:
             self.results.append(enum_value)
-        elif self.graph_mode == GraphMode.SAVE_ONLY:
-            self.results.append(self.get_int_for_enum(enum_value))
         else:
             raise ValueError("Invalid graph mode")

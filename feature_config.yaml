@@ -1,18 +1,18 @@
 features:
   - name: EMOTIONAL_INTENSITY
-    graph_mode: BAR
+    result_collection_mode: NUMBER_REPRESENTATION
   - name: MOOD
-    graph_mode: COLOR
+    result_collection_mode: FIELD_NAME
   - name: DESCRIPTIVE_DETAIL_LEVEL
-    graph_mode: SAVE_ONLY
+    result_collection_mode: NUMBER_REPRESENTATION
   - name: MYSTERY_LEVEL
-    graph_mode: SAVE_ONLY
+    result_collection_mode: NUMBER_REPRESENTATION
   - name: PACING
-    graph_mode: SAVE_ONLY
+    result_collection_mode: NUMBER_REPRESENTATION
   - name: LEVEL_OF_SUSPENSE
-    graph_mode: SAVE_ONLY
+    result_collection_mode: NUMBER_REPRESENTATION
   - name: "Smell Sensory Detail Level"
-    graph_mode: SAVE_ONLY
+    result_collection_mode: NUMBER_REPRESENTATION
     customizations:
       levels:
         - "none"

@@ -1,7 +1,9 @@
 from enum import Enum
 from typing import Dict, Type
 
-from writing_feature_extractor.features.graph_mode import GraphMode
+from writing_feature_extractor.features.result_collection_mode import (
+    ResultCollectionMode,
+)
 from writing_feature_extractor.features.writing_feature import WritingFeature
 
 
@@ -11,9 +13,9 @@ class GenericFeature(WritingFeature):
         name: str,
         levels: Type[Enum],
         colors: Dict[str, str],
-        graph_mode: GraphMode = GraphMode.BAR,
+        result_collection_mode: ResultCollectionMode = ResultCollectionMode.NUMBER_REPRESENTATION,
     ):
-        super().__init__(graph_mode)
+        super().__init__(result_collection_mode)
         self.name = name
         self.levels = levels
         self.colors = colors

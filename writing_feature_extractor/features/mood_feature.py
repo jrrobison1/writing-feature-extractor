@@ -1,14 +1,20 @@
 from enum import Enum
 
-from writing_feature_extractor.features.graph_mode import GraphMode
+from writing_feature_extractor.features.result_collection_mode import (
+    ResultCollectionMode,
+)
 from writing_feature_extractor.features.writing_feature import WritingFeature
 
 
 class MoodFeature(WritingFeature):
     """Feature extractor for the mood of the text."""
 
-    def __init__(self, graph_mode: GraphMode = GraphMode.COLOR):
-        self.graph_mode = graph_mode
+    def __init__(
+        self,
+        result_collection_mode: ResultCollectionMode = ResultCollectionMode.FIELD_NAME,
+    ):
+        # This feature is only available by adding field name results
+        self.result_collection_mode = ResultCollectionMode.FIELD_NAME
 
     results: list[int] = []
 
@@ -57,6 +63,3 @@ class MoodFeature(WritingFeature):
 
     def get_int_for_enum(self, typ: type):
         raise NotImplemented("MoodFeature is available only in colors")
-
-    def add_result(self, enum_value):
-        self.results.append(enum_value)
