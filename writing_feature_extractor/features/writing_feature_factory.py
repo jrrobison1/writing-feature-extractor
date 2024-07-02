@@ -7,20 +7,14 @@ from writing_feature_extractor.core.custom_exceptions import FeatureExtractorErr
 from writing_feature_extractor.features.available_writing_features import (
     AvailableWritingFeatures,
 )
-from writing_feature_extractor.features.descriptive_detail_level import (
-    DescriptiveDetailLevelFeature,
-)
 from writing_feature_extractor.features.emotional_intensity_feature import (
     EmotionalIntensityFeature,
 )
 from writing_feature_extractor.features.feature_config_data import FeatureConfigData
 from writing_feature_extractor.features.generic_feature import GenericFeature
-from writing_feature_extractor.features.humor_level import HumorLevelFeature
 from writing_feature_extractor.features.level_of_suspense import LevelOfSuspenseFeature
 from writing_feature_extractor.features.mood_feature import MoodFeature
-from writing_feature_extractor.features.mystery_level_feature import MysteryLevelFeature
 from writing_feature_extractor.features.pace_feature import PaceFeature
-from writing_feature_extractor.features.romance_level import RomanceLevelFeature
 from writing_feature_extractor.features.writing_feature import WritingFeature
 from writing_feature_extractor.utils.logger_config import get_logger
 
@@ -35,10 +29,6 @@ class WritingFeatureFactory:
         AvailableWritingFeatures.PACING: PaceFeature,
         AvailableWritingFeatures.MOOD: MoodFeature,
         AvailableWritingFeatures.EMOTIONAL_INTENSITY: EmotionalIntensityFeature,
-        AvailableWritingFeatures.MYSTERY_LEVEL: MysteryLevelFeature,
-        AvailableWritingFeatures.DESCRIPTIVE_DETAIL_LEVEL: DescriptiveDetailLevelFeature,
-        AvailableWritingFeatures.HUMOR_LEVEL: HumorLevelFeature,
-        AvailableWritingFeatures.ROMANCE_LEVEL: RomanceLevelFeature,
         AvailableWritingFeatures.LEVEL_OF_SUSPENSE: LevelOfSuspenseFeature,
     }
 
