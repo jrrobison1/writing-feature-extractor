@@ -4,6 +4,7 @@ from writing_feature_extractor.core.custom_exceptions import ConfigurationError
 from writing_feature_extractor.features.available_writing_features import (
     AvailableWritingFeatures,
 )
+from writing_feature_extractor.features.feature_config_data import FeatureConfigData
 from writing_feature_extractor.features.result_collection_mode import (
     ResultCollectionMode,
 )
@@ -14,9 +15,7 @@ logger = get_logger(__name__)
 
 def load_feature_config(
     config_file: str,
-) -> list[
-    tuple[AvailableWritingFeatures, ResultCollectionMode, list[str], dict[str, str]]
-]:
+) -> list[FeatureConfigData]:
     """Load feature configuration from a YAML file."""
     try:
         with open(config_file, "r") as file:
@@ -37,7 +36,12 @@ def load_feature_config(
             result_collection_mode = getattr(
                 ResultCollectionMode, feature["result_collection_mode"]
             )
-            features.append((feature_name, result_collection_mode, levels, color_map))
+
+            features.append(
+                FeatureConfigData(
+                    feature_name, levels, color_map, result_collection_mode
+                )
+            )
 
         return features
     except Exception as e:

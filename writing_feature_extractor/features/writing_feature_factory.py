@@ -13,10 +13,8 @@ from writing_feature_extractor.features.descriptive_detail_level import (
 from writing_feature_extractor.features.emotional_intensity_feature import (
     EmotionalIntensityFeature,
 )
+from writing_feature_extractor.features.feature_config_data import FeatureConfigData
 from writing_feature_extractor.features.generic_feature import GenericFeature
-from writing_feature_extractor.features.result_collection_mode import (
-    ResultCollectionMode,
-)
 from writing_feature_extractor.features.humor_level import HumorLevelFeature
 from writing_feature_extractor.features.level_of_suspense import LevelOfSuspenseFeature
 from writing_feature_extractor.features.mood_feature import MoodFeature
@@ -46,37 +44,34 @@ class WritingFeatureFactory:
 
     @staticmethod
     def get_dynamic_model(
-        features: list[
-            Tuple[
-                AvailableWritingFeatures | str,
-                ResultCollectionMode,
-                list[str],
-                dict[str, str],
-            ]
-        ],
+        features: list[FeatureConfigData],
     ) -> Tuple[type[BaseModel], list[WritingFeature]]:
         """Creates a dynamic pydantic model based on the given writing features"""
 
         try:
             selected_features = dict()
             feature_collectors = []
-            for feature, result_collection_mode, levels, color_map in features:
+            for feature_config in features:
 
-                feature_class = WritingFeatureFactory.FEATURE_MAP.get(feature)
+                feature_class = WritingFeatureFactory.FEATURE_MAP.get(
+                    feature_config.name
+                )
                 if feature_class is None:
                     current_feature = WritingFeatureFactory.create_generic_feature(
-                        feature,
-                        levels,
-                        color_map,
-                        ResultCollectionMode(result_collection_mode),
+                        feature_config
                     )
                 else:
-                    current_feature = feature_class(result_collection_mode)
+                    current_feature = feature_class(
+                        feature_config.result_collection_mode
+                    )
 
                 logger.info(
                     f"Adding feature: [{current_feature.pydantic_feature_label}] to the dynamic model"
                 )
 
+                # For some reason, using Union with string with the feature type actually does a
+                # better job for feature extraction than just using the feature type. The extracted
+                # feature still has the type of the enum.
                 selected_features[current_feature.pydantic_feature_label] = (
                     Union[current_feature.pydantic_feature_type, str],
                     Field(
@@ -102,24 +97,30 @@ class WritingFeatureFactory:
 
     @staticmethod
     def create_generic_feature(
-        feature_name: str,
-        levels: list[str],
-        colors: dict[str, str],
-        result_collection_mode: ResultCollectionMode,
+        feature_config: FeatureConfigData,
     ) -> GenericFeature:
         """Creates a generic writing feature based on the given feature name"""
 
-        enum_name = feature_name.lower().replace("_", " ").title().replace(" ", "")
+        enum_name = (
+            feature_config.name.lower().replace("_", " ").title().replace(" ", "")
+        )
 
         logger.info(
-            f"Creating dynamic enum for feature: [{feature_name}] with enum name: [{enum_name}] and levels: [{levels}]"
+            f"Creating dynamic enum for feature: [{feature_config.name}] with enum name: [{enum_name}] and levels: [{feature_config.levels}]"
         )
-        CustomEnum = WritingFeatureFactory.create_dynamic_enum(enum_name, levels)
+        CustomEnum = WritingFeatureFactory.create_dynamic_enum(
+            enum_name, feature_config.levels
+        )
 
         logger.info(
-            f"Creating generic feature: [{feature_name}] with levels: [{levels}], colors: [{colors}] and graph mode: [{result_collection_mode}]"
+            f"Creating generic feature: [{feature_config.name}] with levels: [{feature_config.levels}], colors: [{feature_config.colors}] and graph mode: [{feature_config.result_collection_mode}]"
         )
-        return GenericFeature(feature_name, CustomEnum, colors, result_collection_mode)
+        return GenericFeature(
+            feature_config.name,
+            CustomEnum,
+            feature_config.colors,
+            feature_config.result_collection_mode,
+        )
 
     @staticmethod
     def create_dynamic_enum(enum_name, values):
