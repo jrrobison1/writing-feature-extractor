@@ -109,8 +109,6 @@ class WritingFeatureFactory:
     ) -> GenericFeature:
         """Creates a generic writing feature based on the given feature name"""
 
-        logger.info(f"Creating generic feature: [{feature_name}]")
-
         enum_name = feature_name.lower().replace("_", " ").title().replace(" ", "")
 
         logger.info(
@@ -125,4 +123,9 @@ class WritingFeatureFactory:
 
     @staticmethod
     def create_dynamic_enum(enum_name, values):
-        return Enum(enum_name, {value.upper(): value for value in values})
+        return Enum(
+            enum_name,
+            {value.upper(): value for value in values},
+            type=str,
+            module=__name__,
+        )
