@@ -82,7 +82,6 @@ class WritingFeatureFactory:
 
         except Exception as e:
             logger.error(f"Error creating dynamic model: {e}")
-            logger.debug(f"Error details:", exc_info=True)
             raise FeatureExtractorError("Error creating dynamic model") from e
 
     @staticmethod
@@ -95,7 +94,7 @@ class WritingFeatureFactory:
             feature_config.name.lower().replace("_", " ").title().replace(" ", "")
         )
 
-        logger.info(
+        logger.debug(
             f"Creating dynamic enum for feature: [{feature_config.name}] with enum name: [{enum_name}] and levels: [{feature_config.levels}]"
         )
         CustomEnum = WritingFeatureFactory.create_dynamic_enum(

@@ -8,7 +8,6 @@ from langchain_core.prompts import PromptTemplate
 from langchain_core.pydantic_v1 import BaseModel
 from langchain_core.runnables import Runnable
 
-from writing_feature_extractor.core.available_models import AvailableModels
 from writing_feature_extractor.core.custom_exceptions import ModelError
 from writing_feature_extractor.prompt_templates.more_detailed_prompt import (
     more_detailed_prompt,
@@ -59,7 +58,6 @@ def create_openai_model(
         ).with_structured_output(PydanticModel)
     except Exception as e:
         logger.error(f"Error creating OpenAI model: {e}")
-        logger.debug("Error details:", exc_info=True)
         raise ModelError("Failed to create OpenAI model.") from e
 
 
@@ -75,7 +73,6 @@ def create_anthropic_model(
         ).with_structured_output(PydanticModel)
     except Exception as e:
         logger.error(f"Error creating Anthropic model: {e}")
-        logger.debug("Error details:", exc_info=True)
         raise ModelError("Failed to create Anthropic model.") from e
 
 
@@ -91,7 +88,6 @@ def create_groq_model(
         ).with_structured_output(PydanticModel)
     except Exception as e:
         logger.error(f"Error creating Groq model: {e}")
-        logger.debug("Error details:", exc_info=True)
         raise ModelError("Failed to create Groq model.") from e
 
 
@@ -112,7 +108,6 @@ def create_gemini_model(
         return prompt | llm | parser
     except Exception as e:
         logger.error(f"Error creating Google Gemini model: {e}")
-        logger.debug("Error details:", exc_info=True)
         raise ModelError("Failed to create Google Gemini model.") from e
 
 
@@ -122,19 +117,23 @@ def create_openrouter_model(
 ) -> Runnable[LanguageModelInput, BaseModel]:
     from langchain_openai import ChatOpenAI
 
-    parser = PydanticOutputParser(pydantic_object=PydanticModel)
+    try:
+        parser = PydanticOutputParser(pydantic_object=PydanticModel)
 
-    prompt = PromptTemplate(
-        template=more_detailed_prompt,
-        input_variables=["input"],
-        partial_variables={"format_instructions": parser.get_format_instructions()},
-    )
+        prompt = PromptTemplate(
+            template=more_detailed_prompt,
+            input_variables=["input"],
+            partial_variables={"format_instructions": parser.get_format_instructions()},
+        )
 
-    llm = ChatOpenAI(
-        base_url="https://openrouter.ai/api/v1",
-        api_key=getenv("OPENROUTER_API_KEY"),
-        model=model_name,
-        temperature=0,
-    )
+        llm = ChatOpenAI(
+            base_url="https://openrouter.ai/api/v1",
+            api_key=getenv("OPENROUTER_API_KEY"),
+            model=model_name,
+            temperature=0,
+        )
 
-    return prompt | llm | parser
+        return prompt | llm | parser
+    except Exception as e:
+        logger.error(f"Error creating OpenRouter model: {e}")
+        raise ModelError("Failed to create OpenRouter model.") from e

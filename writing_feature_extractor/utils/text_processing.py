@@ -13,7 +13,6 @@ def load_text(file_path: str) -> str:
             return f.read()
     except Exception as e:
         logger.error(f"Error loading text from {file_path}: {e}")
-        logger.debug("Error details:", exc_info=True)
         raise FileOperationError("Could not load text from the given file/path.") from e
 
 

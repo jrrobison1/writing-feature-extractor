@@ -1,7 +1,7 @@
 from dotenv import load_dotenv
 
 from writing_feature_extractor.cli import parse_arguments
-from writing_feature_extractor.core.available_models import AvailableModels
+from writing_feature_extractor.core.custom_exceptions import FeatureExtractorError
 from writing_feature_extractor.core.feature_config import load_feature_config
 from writing_feature_extractor.core.feature_extraction import extract_features
 from writing_feature_extractor.core.model_factory import ModelFactory
@@ -22,16 +22,21 @@ logger = get_logger(__name__)
 
 
 def main():
-    args = parse_arguments()
+    try:
+        args = parse_arguments()
 
-    if args.graph:
-        return handle_graph_generation(args)
-    elif args.file:
-        handle_feature_extraction(args)
-    else:
-        logger.error(
-            "Please provide an input file or use --graph with a saved CSV file"
-        )
+        if args.graph:
+            return handle_graph_generation(args)
+        elif args.file:
+            handle_feature_extraction(args)
+        else:
+            logger.error(
+                "Please provide an input file or use --graph with a saved CSV file"
+            )
+    except FeatureExtractorError as fee:
+        logger.error(f"Feature extractor error: {fee}")
+    except Exception as e:
+        logger.error(f"An unhandled error occurred: {e}")
 
 
 def handle_feature_extraction(args):
@@ -45,7 +50,7 @@ def handle_feature_extraction(args):
     )
 
     llm = ModelFactory.get_llm_model(args.provider, args.model, DynamicFeatureModel)
-    logger.debug(f"Obtained LLM model: {llm}")
+    logger.info(f"Obtained LLM model: {llm}")
 
     # llm_2 = ModelFactory.get_llm_model(AvailableModels.GPT_3_5, DynamicFeatureModel)
 

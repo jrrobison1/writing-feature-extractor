@@ -23,7 +23,6 @@ def calculate_dialogue_percentage(text: str):
         return dialogue_percentage
     except Exception as e:
         logger.error(f"Error calculating dialogue percentage: {e}. Returning zero.")
-        logger.debug("Error details:", exc_info=True)
         return 0
 
 
@@ -55,7 +54,6 @@ def combine_short_strings(
         logger.error(
             f"Failure while combining short strings: {e}. Returning original list of strings"
         )
-        logger.debug("Error details:", exc_info=True)
         return strings
 
 
@@ -83,5 +81,4 @@ def get_text_statistics(text: str) -> dict[str]:
         return text_statistics
     except Exception as e:
         logger.error(f"Error calculating text statistics: {e}")
-        logger.debug("Error details:", exc_info=True)
         return dict()

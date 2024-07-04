@@ -56,5 +56,4 @@ def save_results_to_csv(
         logger.info(f"Results saved to {filename}")
     except Exception as e:
         logger.error(f"Error saving results to CSV: {e}")
-        logger.debug("Error details:", exc_info=True)
         raise FileOperationError(f"Failed to save results to {filename}.") from e

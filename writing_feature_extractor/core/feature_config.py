@@ -44,9 +44,14 @@ def load_feature_config(
             )
 
         return features
+    except OSError as ose:
+        logger.error(
+            f"A basic IO error occurred; the file {config_file} could not be found: {ose}"
+        )
+    except yaml.YAMLError as ye:
+        logger.error(f"Error parsing the YAML file {config_file}: {ye}")
     except Exception as e:
         logger.error(f"Error loading feature configuration from {config_file}: {e}")
-        logger.debug("Error details:", exc_info=True)
         raise ConfigurationError(
             "A problem occurred when loading the feature configuration from file {config_file}."
         ) from e

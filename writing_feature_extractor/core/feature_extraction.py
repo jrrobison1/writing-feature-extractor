@@ -87,15 +87,12 @@ def process_text(
     triangulation_results = []
     try:
         result = llm.invoke(input=text)
-        logger.info(f"LLM Result: [{str(result)}]")
+        logger.debug(f"LLM Result: [{str(result)}]")
         if triangulation_llms:
             get_triangulation_results(text, triangulation_llms, triangulation_results)
     except Exception as e:
         logger.error("Error invoking the LLM", e)
-        logger.info(
-            f"Error invoking the LLM with text: {text},  llm: {llm}",
-            exc_info=True,
-        )
+        logger.debug(f"Text: {text},  llm: {llm}")
         return
 
     result_dict = result.dict()
@@ -114,7 +111,7 @@ def get_triangulation_results(text, triangulation_llms, triangulation_results):
     for llm in triangulation_llms:
         tri_result = llm.invoke(input=text)
         triangulation_results.append(tri_result)
-        logger.info(f"Triangulation Member LLM Result: [{str(tri_result)}]")
+        logger.debug(f"Triangulation Member LLM Result: [{str(tri_result)}]")
     return llm
 
 
