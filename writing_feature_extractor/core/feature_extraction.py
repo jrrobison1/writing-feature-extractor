@@ -1,7 +1,11 @@
+from enum import Enum
 from langchain_core.language_models import LanguageModelInput
 from langchain_core.pydantic_v1 import BaseModel
 from langchain_core.runnables import Runnable
 
+from writing_feature_extractor.features.result_collection_mode import (
+    ResultCollectionMode,
+)
 from writing_feature_extractor.features.writing_feature import WritingFeature
 from writing_feature_extractor.utils.logger_config import get_logger
 from writing_feature_extractor.utils.save_results_to_csv import save_results_to_csv
@@ -13,15 +17,77 @@ from writing_feature_extractor.utils.text_metrics import (
 logger = get_logger(__name__)
 
 
+def process_feature_with_triangulation(
+    result: BaseModel, triangulation_results: list[Enum], feature: WritingFeature
+):
+    """Process a feature with triangulation results"""
+
+    result_dict = result.dict()
+    feature_results = list(
+        res.dict()[feature.pydantic_feature_label] for res in triangulation_results
+    )
+
+    if feature.result_collection_mode == ResultCollectionMode.NUMBER_REPRESENTATION:
+        triangulated_result = get_triangulated_number_representation(
+            feature, result_dict, feature_results
+        )
+
+    else:
+        triangulated_result = get_triangulated_mode(
+            feature, result_dict, feature_results
+        )
+
+    if triangulated_result != result_dict[feature.pydantic_feature_label]:
+        logger.info(
+            f"Triangulated result is different from main LLM: Average: {triangulated_result}, Main LLM: {result_dict[feature.pydantic_feature_label]}"
+        )
+        logger.info(
+            f"Adding result [{triangulated_result}] for feature: [{feature.pydantic_feature_label}]"
+        )
+
+        feature.add_result(triangulated_result)
+
+
+def get_triangulated_number_representation(
+    feature: WritingFeature, result_dict: dict, feature_results: list[Enum]
+) -> Enum:
+    tri_results_as_ints = [
+        feature.get_int_for_enum(feature_result) for feature_result in feature_results
+    ]
+    tri_results_as_ints.append(
+        feature.get_int_for_enum(result_dict[feature.pydantic_feature_label])
+    )
+
+    # Get floor of average of triangulation results
+    floor_of_average = int(sum(tri_results_as_ints) / len(tri_results_as_ints))
+    average_as_enum = list(feature.pydantic_feature_type)[floor_of_average]
+
+    return average_as_enum
+
+
+def get_triangulated_mode(
+    feature: WritingFeature, result_dict: dict, feature_results: list[BaseModel]
+) -> Enum:
+    feature_results.append(result_dict[feature.pydantic_feature_label])
+    mode = max(set(feature_results), key=feature_results.count)
+
+    return mode
+
+
 def process_text(
     text: str,
     feature_collectors: list[WritingFeature],
     llm: Runnable[LanguageModelInput, BaseModel],
+    triangulation_llms: list[Runnable[LanguageModelInput, BaseModel]] = None,
 ):
     """Run LLM on a text to perform feature extraction"""
+
+    triangulation_results = []
     try:
         result = llm.invoke(input=text)
         logger.info(f"LLM Result: [{str(result)}]")
+        if triangulation_llms:
+            get_triangulation_results(text, triangulation_llms, triangulation_results)
     except Exception as e:
         logger.error("Error invoking the LLM", e)
         logger.info(
@@ -31,13 +97,23 @@ def process_text(
         return
 
     result_dict = result.dict()
-    result_dict["text_statistics"] = get_text_statistics(text)
 
     for feature in feature_collectors:
-        logger.info(
-            f"Adding result [{result_dict[feature.pydantic_feature_label]}] for feature: [{feature.pydantic_feature_label}]"
-        )
-        feature.add_result(result_dict[feature.pydantic_feature_label])
+        if len(triangulation_results) > 0:
+            process_feature_with_triangulation(result, triangulation_results, feature)
+        else:
+            logger.info(
+                f"Adding result [{result_dict[feature.pydantic_feature_label]}] for feature: [{feature.pydantic_feature_label}]"
+            )
+            feature.add_result(result_dict[feature.pydantic_feature_label])
+
+
+def get_triangulation_results(text, triangulation_llms, triangulation_results):
+    for llm in triangulation_llms:
+        tri_result = llm.invoke(input=text)
+        triangulation_results.append(tri_result)
+        logger.info(f"Triangulation Member LLM Result: [{str(tri_result)}]")
+    return llm
 
 
 def extract_features(
@@ -45,6 +121,7 @@ def extract_features(
     mode: str,
     feature_collectors: list[WritingFeature],
     llm: Runnable[LanguageModelInput, BaseModel],
+    triangulation_llms: list[Runnable[LanguageModelInput, BaseModel]] = None,
 ):
     """Extract features from the text and display them in a graph."""
     for feature in feature_collectors:
@@ -58,7 +135,7 @@ def extract_features(
             paragraphs = combine_short_strings(paragraphs)
             text_metrics = []
             for paragraph in paragraphs:
-                process_text(paragraph, feature_collectors, llm)
+                process_text(paragraph, feature_collectors, llm, triangulation_llms)
                 text_metrics.append(get_text_statistics(paragraph))
                 text_units.append(paragraph)
             logger.info("Saving results to CSV...")

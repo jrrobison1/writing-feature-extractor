@@ -47,8 +47,16 @@ def handle_feature_extraction(args):
     llm = ModelFactory.get_llm_model(AvailableModels.CLAUDE_HAIKU, DynamicFeatureModel)
     logger.debug(f"Obtained LLM model: {llm}")
 
+    llm_2 = ModelFactory.get_llm_model(AvailableModels.GPT_3_5, DynamicFeatureModel)
+
+    llm_3 = ModelFactory.get_llm_model(
+        AvailableModels.MIXTRAL_8_22_INSTRUCT, DynamicFeatureModel
+    )
+
     sections = split_into_sections(text)
-    result = extract_features(sections, args.mode, feature_collectors, llm)
+    result = extract_features(
+        sections, args.mode, feature_collectors, llm, [llm_2, llm_3]
+    )
 
     if result:
         feature_collectors, text_units, text_metrics = result
