@@ -27,6 +27,8 @@ def process_feature_with_triangulation(
         res.dict()[feature.pydantic_feature_label] for res in triangulation_results
     )
 
+    triangulated_result = result_dict[feature.pydantic_feature_label]
+
     if feature.result_collection_mode == ResultCollectionMode.NUMBER_REPRESENTATION:
         triangulated_result = get_triangulated_number_representation(
             feature, result_dict, feature_results
@@ -41,11 +43,11 @@ def process_feature_with_triangulation(
         logger.info(
             f"Triangulated result is different from main LLM: Average: {triangulated_result}, Main LLM: {result_dict[feature.pydantic_feature_label]}"
         )
-        logger.info(
-            f"Adding result [{triangulated_result}] for feature: [{feature.pydantic_feature_label}]"
-        )
+    logger.info(
+        f"Adding result [{triangulated_result}] for feature: [{feature.pydantic_feature_label}]"
+    )
 
-        feature.add_result(triangulated_result)
+    feature.add_result(triangulated_result)
 
 
 def get_triangulated_number_representation(
@@ -123,37 +125,71 @@ def extract_features(
     llm: Runnable[LanguageModelInput, BaseModel],
     triangulation_llms: list[Runnable[LanguageModelInput, BaseModel]] = None,
 ):
-    """Extract features from the text and display them in a graph."""
+    """Extract features from the text based on the specified mode."""
     for feature in feature_collectors:
         feature.results.clear()
 
+    if mode == "paragraph":
+        return extract_features_paragraph_mode(
+            sections, feature_collectors, llm, triangulation_llms
+        )
+    elif mode == "section":
+        return extract_features_section_mode(
+            sections, feature_collectors, llm, triangulation_llms
+        )
+    else:
+        raise ValueError(f"Invalid mode: {mode}. Must be 'paragraph' or 'section'.")
+
+
+def extract_features_paragraph_mode(
+    sections: list[str],
+    feature_collectors: list[WritingFeature],
+    llm: Runnable[LanguageModelInput, BaseModel],
+    triangulation_llms: list[Runnable[LanguageModelInput, BaseModel]] = None,
+):
+    """Extract features from the text in paragraph mode."""
+    text_units = []
+    text_metrics = []
+
+    for section in sections:
+        paragraphs = combine_short_strings(section.split("\n"))
+        for paragraph in paragraphs:
+            process_text(paragraph, feature_collectors, llm, triangulation_llms)
+            text_metrics.append(get_text_statistics(paragraph))
+            text_units.append(paragraph)
+
+        logger.info("Saving results to CSV...")
+        save_results_to_csv(feature_collectors, text_metrics, text_units)
+        input("Press Enter to continue...")
+
+    log_processing_results(text_units, feature_collectors)
+    return feature_collectors, text_units, text_metrics
+
+
+def extract_features_section_mode(
+    sections: list[str],
+    feature_collectors: list[WritingFeature],
+    llm: Runnable[LanguageModelInput, BaseModel],
+    triangulation_llms: list[Runnable[LanguageModelInput, BaseModel]] = None,
+):
+    """Extract features from the text in section mode."""
     text_units = []
     section_text_metrics = []
+
     for section in sections:
-        if mode == "paragraph":
-            paragraphs = section.split("\n")
-            paragraphs = combine_short_strings(paragraphs)
-            text_metrics = []
-            for paragraph in paragraphs:
-                process_text(paragraph, feature_collectors, llm, triangulation_llms)
-                text_metrics.append(get_text_statistics(paragraph))
-                text_units.append(paragraph)
-            logger.info("Saving results to CSV...")
-            save_results_to_csv(
-                feature_collectors,
-                text_metrics,
-                text_units,
-            )
-            input("Press Enter to continue...")
+        process_text(section, feature_collectors, llm, triangulation_llms)
+        section_text_metrics.append(get_text_statistics(section))
+        text_units.append(section)
 
-        elif mode == "section":
-            process_text(section, feature_collectors, llm)
-            section_text_metrics.append(get_text_statistics(section))
-            text_units.append(section)
+    log_processing_results(text_units, feature_collectors)
+    return feature_collectors, text_units, section_text_metrics
 
+
+def log_processing_results(
+    text_units: list[str], feature_collectors: list[WritingFeature]
+):
+    """Log the results of text processing."""
     logger.debug(f"Number of text units processed: {len(text_units)}")
     logger.debug(
         f"Number of results in each feature collector: {[len(fc.results) for fc in feature_collectors]}"
     )
-
-    return feature_collectors, text_units, section_text_metrics
