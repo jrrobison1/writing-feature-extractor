@@ -21,10 +21,11 @@ class MoodFeature(WritingFeature):
     class Mood(str, Enum):
         """Mood of the text. The mood MUST be one of these selections. If the mood is not listed, choose the closest semantic match."""
 
-        POSITIVE = "positive"
+        HAPPY = "happy"
         SAD = "sad"
+        TENSE = "tense"
         ANGRY = "angry"
-        SUSPENSEFUL = "suspenseful"
+        CONTEMPLATIVE = "contemplative"
         NEUTRAL = "neutral"
 
     @property
