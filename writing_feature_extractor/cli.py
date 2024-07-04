@@ -32,4 +32,10 @@ def parse_arguments():
         default="feature_config.yaml",
         help="YAML configuration file for features",
     )
+    parser.add_argument(
+        "--provider", default="anthropic", help="The LLM provider to use"
+    )
+    parser.add_argument(
+        "--model", default="claude-3-haiku-20240307", help="The specific model to use"
+    )
     return parser.parse_args()
