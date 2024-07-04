@@ -7,7 +7,7 @@ class EmotionalIntensityFeature(WritingFeature):
     """Feature extractor for the emotional intensity of the text."""
 
     class EmotionalIntensity(str, Enum):
-        """Strength or intensity of emotions expressed in the text. Can be 'none', 'very low', 'low', 'medium low', 'medium', 'medium high', 'high', or 'very high'."""
+        """Strength or intensity of emotions expressed in the text."""
 
         NONE = "none"
         LOW = "low"
