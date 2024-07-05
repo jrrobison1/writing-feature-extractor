@@ -20,7 +20,9 @@ def calculate_dialogue_percentage(text: str) -> float:
             (dialogue_length / total_length) * 100 if total_length > 0 else 0
         )
 
-        return dialogue_percentage
+        dp_as_string = f"{dialogue_percentage:.2f}%"
+
+        return dp_as_string
     except Exception as e:
         logger.error(f"Error calculating dialogue percentage: {e}. Returning zero.")
         return 0
@@ -62,9 +64,7 @@ def get_text_statistics(text: str) -> dict[str]:
 
     try:
         text_statistics = dict()
-        dialogue_percentage = calculate_dialogue_percentage(text)
-        dp_as_string = f"{dialogue_percentage:.2f}%"
-        text_statistics["dialogue_percentage"] = dp_as_string
+        text_statistics["dialogue_percentage"] = calculate_dialogue_percentage(text)
         text_statistics["readability_ease"] = textstat.flesch_reading_ease(text)
         text_statistics["readability_grade"] = textstat.flesch_kincaid_grade(text)
         text_statistics["sentence_count"] = textstat.sentence_count(text)
