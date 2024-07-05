@@ -21,7 +21,7 @@ class GenericFeature(WritingFeature):
         self.colors = colors
 
     @property
-    def y_level_label(self):
+    def y_level_label(self) -> str:
         return self.name
 
     @property
@@ -29,13 +29,13 @@ class GenericFeature(WritingFeature):
         return self.colors
 
     @property
-    def pydantic_feature_label(self):
+    def pydantic_feature_label(self) -> str:
         return self.name.lower().replace(" ", "_")
 
     @property
-    def pydantic_feature_type(self):
+    def pydantic_feature_type(self) -> Type[Enum]:
         return self.levels
 
     @property
-    def pydantic_docstring(self):
+    def pydantic_docstring(self) -> str:
         return f"Level of {self.name.lower()} in the text."

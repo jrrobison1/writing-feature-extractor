@@ -1,3 +1,4 @@
+from argparse import Namespace
 from dotenv import load_dotenv
 
 from writing_feature_extractor.cli import parse_arguments
@@ -21,7 +22,7 @@ from writing_feature_extractor.utils.text_processing import (
 logger = get_logger(__name__)
 
 
-def main():
+def main() -> None:
     try:
         args = parse_arguments()
 
@@ -39,7 +40,7 @@ def main():
         logger.error(f"An unhandled error occurred: {e}")
 
 
-def handle_feature_extraction(args):
+def handle_feature_extraction(args: Namespace) -> None:
     """Handle feature extraction from the input text."""
 
     text = load_text(args.file)
@@ -69,7 +70,7 @@ def handle_feature_extraction(args):
             )
 
 
-def handle_graph_generation(args):
+def handle_graph_generation(args: Namespace) -> None:
     """Handle graph generation from a saved CSV file."""
 
     if not (args.bar_feature and args.color_feature):

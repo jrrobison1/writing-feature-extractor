@@ -18,19 +18,19 @@ class PaceFeature(WritingFeature):
         VERY_FAST = "very fast"
 
     @property
-    def y_level_label(self):
+    def y_level_label(self) -> str:
         return "Pace"
 
     @property
-    def pydantic_feature_label(self):
+    def pydantic_feature_label(self) -> str:
         return "pace"
 
     @property
-    def pydantic_feature_type(self):
+    def pydantic_feature_type(self) -> type[Enum]:
         return self.Pace
 
     @property
-    def pydantic_docstring(self):
+    def pydantic_docstring(self) -> str:
         return "Pace/speed of the narrative."
 
     @property

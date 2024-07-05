@@ -8,7 +8,7 @@ MININUM_WORDS_PER_PARAGRAPH = 8
 NUMBER_OF_CHARACTERS_TO_SHOW_WHEN_COMBINING = 20
 
 
-def calculate_dialogue_percentage(text: str):
+def calculate_dialogue_percentage(text: str) -> float:
     """Calculate the percentage of text that is within dialogue tags"""
 
     try:

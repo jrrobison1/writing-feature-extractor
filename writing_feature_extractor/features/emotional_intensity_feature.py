@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Type
 
 from writing_feature_extractor.features.writing_feature import WritingFeature
 
@@ -15,19 +16,19 @@ class EmotionalIntensityFeature(WritingFeature):
         HIGH = "high"
 
     @property
-    def y_level_label(self):
+    def y_level_label(self) -> str:
         return "Emotional Intensity"
 
     @property
-    def pydantic_feature_label(self):
+    def pydantic_feature_label(self) -> str:
         return "emotional_intensity"
 
     @property
-    def pydantic_feature_type(self):
+    def pydantic_feature_type(self) -> Type[Enum]:
         return self.EmotionalIntensity
 
     @property
-    def pydantic_docstring(self):
+    def pydantic_docstring(self) -> str:
         return "Strength or intensity of emotions expressed in the text"
 
     @property

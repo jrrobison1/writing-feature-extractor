@@ -15,7 +15,7 @@ class LevelOfSuspenseFeature(WritingFeature):
         HIGH = "high"
 
     @property
-    def y_level_label(self):
+    def y_level_label(self) -> str:
         return "Level of Suspense"
 
     @property
@@ -28,13 +28,13 @@ class LevelOfSuspenseFeature(WritingFeature):
         }
 
     @property
-    def pydantic_feature_label(self):
+    def pydantic_feature_label(self) -> str:
         return "level_of_suspense"
 
     @property
-    def pydantic_feature_type(self):
+    def pydantic_feature_type(self) -> type[Enum]:
         return self.LevelOfSuspense
 
     @property
-    def pydantic_docstring(self):
+    def pydantic_docstring(self) -> str:
         return "Level of suspense and tension in the text."

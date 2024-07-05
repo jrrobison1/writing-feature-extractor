@@ -16,7 +16,7 @@ def save_results_to_csv(
     text_metrics: list[dict[str, Any]],
     text_units: List[str],
     filename: str = DEFAULT_CSV_FILE,
-):
+) -> None:
     """
     Save the results of all features to a CSV file.
 

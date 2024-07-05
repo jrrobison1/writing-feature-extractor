@@ -13,7 +13,9 @@ from writing_feature_extractor.utils.logger_config import get_logger
 logger = get_logger(__name__)
 
 
-def generate_graph_from_csv(filename: str, bar_feature: str, color_feature: str):
+def generate_graph_from_csv(
+    filename: str, bar_feature: str, color_feature: str
+) -> None:
     """
     Generate a graph from the saved CSV file using predefined colors and custom y-axis labels.
 

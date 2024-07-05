@@ -112,7 +112,7 @@ class WritingFeatureFactory:
         )
 
     @staticmethod
-    def create_dynamic_enum(enum_name, values):
+    def create_dynamic_enum(enum_name, values) -> Enum:
         return Enum(
             enum_name,
             {value.upper(): value for value in values},
