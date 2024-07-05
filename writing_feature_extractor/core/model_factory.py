@@ -41,7 +41,10 @@ class ModelFactory:
     ) -> Runnable[LanguageModelInput, BaseModel]:
         creator = cls._creators.get(provider)
         if creator:
-            return creator(model_name, PydanticModel)
+            try:
+                return creator(model_name, PydanticModel)
+            except Exception as e:
+                raise ModelError(f"Failed to create {provider} model: {str(e)}")
         else:
             raise ValueError(f"Provider {provider} not found")
 
