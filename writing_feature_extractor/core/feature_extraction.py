@@ -157,7 +157,7 @@ def extract_features_paragraph_mode(
 
         logger.info("Saving results to CSV...")
         save_results_to_csv(feature_collectors, text_metrics, text_units)
-        input("Press Enter to continue...")
+        # input("Press Enter to continue...")
 
     log_processing_results(text_units, feature_collectors)
     return feature_collectors, text_units, text_metrics
