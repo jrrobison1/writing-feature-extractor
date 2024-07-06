@@ -38,7 +38,10 @@ class CliModelProvider(str, Enum):
     google = "google"
 
 
-@app.command("extract")
+@app.command(
+    name="extract",
+    no_args_is_help=True,
+)
 def extract(
     file: Path = typer.Argument(
         ..., exists=True, dir_okay=False, help="Input text file to analyze"
@@ -47,7 +50,7 @@ def extract(
         CliAnalysisMode.paragraph,
         help="Analysis mode: paragraph-by-paragraph or section-by-section",
     ),
-    save: bool = typer.Option(False, help="Save results to CSV"),
+    save: bool = typer.Option(True, help="Save results to CSV"),
     csv_file: Path = typer.Option(
         "feature_results.csv", help="CSV file to which results will be saved"
     ),
@@ -58,7 +61,17 @@ def extract(
         "anthropic", help="The LLM provider to use"
     ),
     model: str = typer.Option(
-        "claude-3-haiku-20240307", help="The specific model to use"
+        "claude-3-haiku-20240307",
+        help="""
+        The model to use. Common models include:\n
+            - anthropic: 'claude-3-5-sonnet-20240620', 'claude-3-opus-20240229', 'claude-3-haiku-20240307'\n 
+            - openai: 'gpt-3.5-turbo', 'gpt-4o'\n
+            - openrouter: 'meta-llama/llama-3-70b-instruct', 'mistralai/mixtral-8x22b-instruct', 
+              'qwen/qwen-2-72b-instruct', 'meta-llama/llama-3-8b-instruct:free', 
+              'mistralai/mixtral-8x7b-instruct', 'qwen/qwen-14b-chat'\n
+            - groq: 'llama3-70b-8192'\n
+            - google: 'gemini-1.5-pro'
+        """,
     ),
 ):
     """Extract features from the input text."""
@@ -86,7 +99,7 @@ def extract(
         logger.error(f"An unhandled general exception has occurred: {e}")
 
 
-@app.command("graph")
+@app.command(name="graph", no_args_is_help=True)
 def generate_graph(
     csv_file: Path = typer.Argument(
         ..., exists=True, dir_okay=False, help="CSV file to read results from"
