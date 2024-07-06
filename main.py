@@ -3,7 +3,6 @@ from pathlib import Path
 from dotenv import load_dotenv
 import typer
 
-from writing_feature_extractor.cli import parse_arguments
 from writing_feature_extractor.core.custom_exceptions import FeatureExtractorError
 from writing_feature_extractor.core.feature_config import load_feature_config
 from writing_feature_extractor.core.feature_extraction import extract_features
