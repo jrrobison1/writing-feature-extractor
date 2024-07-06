@@ -22,7 +22,7 @@ from writing_feature_extractor.utils.text_processing import (
 
 logger = get_logger(__name__)
 
-app = typer.Typer()
+app = typer.Typer(no_args_is_help=True, add_completion=False)
 
 
 class CliAnalysisMode(str, Enum):
@@ -61,7 +61,7 @@ def extract(
         "claude-3-haiku-20240307", help="The specific model to use"
     ),
 ):
-    """Handle feature extraction from the input text."""
+    """Extract features from the input text."""
 
     try:
         text = load_text(file)
@@ -98,7 +98,7 @@ def generate_graph(
         ..., help="Feature to use for bar colors when generating graph"
     ),
 ):
-    """Handle graph generation from a saved CSV file."""
+    """Generate a graph from a saved CSV file."""
 
     try:
         generate_graph_from_csv(csv_file, bar_feature, color_feature)
