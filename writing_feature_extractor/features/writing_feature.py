@@ -70,7 +70,7 @@ class WritingFeature(ABC):
         displayed out of order and incorrectly."""
         return list(self.pydantic_feature_type).index(enum_value)
 
-    def add_result(self, enum_value: Enum):
+    def add_result(self, enum_value: Enum) -> None:
         """For results collection. Add a result to the results list."""
         if self.result_collection_mode == ResultCollectionMode.NUMBER_REPRESENTATION:
             self.results.append(self.get_int_for_enum(enum_value))
