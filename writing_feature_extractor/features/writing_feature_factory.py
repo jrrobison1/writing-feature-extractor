@@ -3,7 +3,10 @@ from typing import Dict, Tuple, Type, Union
 
 from langchain_core.pydantic_v1 import BaseModel, Field, create_model
 
-from writing_feature_extractor.core.custom_exceptions import FeatureExtractorError
+from writing_feature_extractor.core.custom_exceptions import (
+    FeatureExtractorError,
+    ModelError,
+)
 from writing_feature_extractor.features.available_writing_features import (
     AvailableWritingFeatures,
 )
@@ -37,6 +40,8 @@ class WritingFeatureFactory:
         features: list[FeatureConfigData],
     ) -> Tuple[type[BaseModel], list[WritingFeature]]:
         """Creates a dynamic pydantic model based on the given writing features"""
+        if features is None or not features:
+            raise ModelError("No features provided for dynamic model creation")
 
         try:
             selected_features = dict()
