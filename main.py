@@ -1,5 +1,7 @@
-from argparse import Namespace
+from enum import Enum
+from pathlib import Path
 from dotenv import load_dotenv
+import typer
 
 from writing_feature_extractor.cli import parse_arguments
 from writing_feature_extractor.core.custom_exceptions import FeatureExtractorError
@@ -21,66 +23,96 @@ from writing_feature_extractor.utils.text_processing import (
 
 logger = get_logger(__name__)
 
+app = typer.Typer()
 
-def main() -> None:
+
+class CliAnalysisMode(str, Enum):
+    paragraph = "paragraph"
+    section = "section"
+
+
+class CliModelProvider(str, Enum):
+    anthropic = "anthropic"
+    openai = "openai"
+    openrouter = "openrouter"
+    groq = "groq"
+    google = "google"
+
+
+@app.command("extract")
+def extract(
+    file: Path = typer.Argument(
+        ..., exists=True, dir_okay=False, help="Input text file to analyze"
+    ),
+    mode: CliAnalysisMode = typer.Option(
+        CliAnalysisMode.paragraph,
+        help="Analysis mode: paragraph-by-paragraph or section-by-section",
+    ),
+    save: bool = typer.Option(False, help="Save results to CSV"),
+    csv_file: Path = typer.Option(
+        "feature_results.csv", help="CSV file to which results will be saved"
+    ),
+    config: Path = typer.Option(
+        "feature_config.yaml", exists=True, help="YAML configuration file for features"
+    ),
+    provider: CliModelProvider = typer.Option(
+        "anthropic", help="The LLM provider to use"
+    ),
+    model: str = typer.Option(
+        "claude-3-haiku-20240307", help="The specific model to use"
+    ),
+):
+    """Handle feature extraction from the input text."""
+
     try:
-        args = parse_arguments()
+        text = load_text(file)
+        features = load_feature_config(config)
 
-        if args.graph:
-            return handle_graph_generation(args)
-        elif args.file:
-            handle_feature_extraction(args)
-        else:
-            logger.error(
-                "Please provide an input file or use --graph with a saved CSV file"
-            )
+        feature_collectors, DynamicFeatureModel = (
+            WritingFeatureFactory.get_dynamic_model(features)
+        )
+
+        llm = ModelFactory.get_llm_model(provider, model, DynamicFeatureModel)
+        logger.info(f"Obtained LLM model: {llm}")
+
+        sections = split_into_sections(text)
+        result = extract_features(sections, mode, feature_collectors, llm, [])
+
+        if result and save:
+            feature_collectors, text_units, text_metrics = result
+            save_results_to_csv(feature_collectors, text_metrics, text_units, csv_file)
     except FeatureExtractorError as fee:
         logger.error(f"Feature extractor error: {fee}")
     except Exception as e:
-        logger.error(f"An unhandled error occurred: {e}")
+        logger.error(f"An unhandled general exception has occurred: {e}")
 
 
-def handle_feature_extraction(args: Namespace) -> None:
-    """Handle feature extraction from the input text."""
-
-    text = load_text(args.file)
-    features = load_feature_config(args.config)
-
-    feature_collectors, DynamicFeatureModel = WritingFeatureFactory.get_dynamic_model(
-        features
-    )
-
-    llm = ModelFactory.get_llm_model(args.provider, args.model, DynamicFeatureModel)
-    logger.info(f"Obtained LLM model: {llm}")
-
-    # llm_2 = ModelFactory.get_llm_model(AvailableModels.GPT_3_5, DynamicFeatureModel)
-
-    # llm_3 = ModelFactory.get_llm_model(
-    #     AvailableModels.MIXTRAL_8_22_INSTRUCT, DynamicFeatureModel
-    # )
-
-    sections = split_into_sections(text)
-    result = extract_features(sections, args.mode, feature_collectors, llm, [])
-
-    if result:
-        feature_collectors, text_units, text_metrics = result
-        if args.save:
-            save_results_to_csv(
-                feature_collectors, text_metrics, text_units, args.csv_file
-            )
-
-
-def handle_graph_generation(args: Namespace) -> None:
+@app.command("graph")
+def generate_graph(
+    csv_file: Path = typer.Argument(
+        ..., exists=True, dir_okay=False, help="CSV file to read results from"
+    ),
+    bar_feature: str = typer.Option(
+        ..., help="Feature to use for bar heights when generating graph"
+    ),
+    color_feature: str = typer.Option(
+        ..., help="Feature to use for bar colors when generating graph"
+    ),
+):
     """Handle graph generation from a saved CSV file."""
 
-    if not (args.bar_feature and args.color_feature):
-        logger.error(
-            "Please specify --bar-feature and --color-feature when using --graph"
-        )
-        return
-    generate_graph_from_csv(args.csv_file, args.bar_feature, args.color_feature)
+    try:
+        generate_graph_from_csv(csv_file, bar_feature, color_feature)
+    except FeatureExtractorError as fee:
+        logger.error(f"Feature extractor error: {fee}")
+    except Exception as e:
+        logger.errorr(f"An unhandled general exception has occurred: {e}")
+
+
+def main() -> None:
+    load_dotenv()
+    app()
 
 
 if __name__ == "__main__":
-    load_dotenv()
     main()
