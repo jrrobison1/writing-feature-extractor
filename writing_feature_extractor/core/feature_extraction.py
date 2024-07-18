@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Any, Tuple
 from langchain_core.language_models import LanguageModelInput
 from langchain_core.pydantic_v1 import BaseModel
 from langchain_core.runnables import Runnable
@@ -93,18 +94,20 @@ def process_text(
     except Exception as e:
         logger.error("Error invoking the LLM", e)
         logger.debug(f"Text: {text},  llm: {llm}")
-        return
 
-    result_dict = result.dict()
+    if result:
+        result_dict = result.dict()
+    else:
+        result_dict = {}
 
     for feature in feature_collectors:
         if len(triangulation_results) > 0:
             process_feature_with_triangulation(result, triangulation_results, feature)
         else:
             logger.info(
-                f"Adding result [{result_dict[feature.pydantic_feature_label]}] for feature: [{feature.pydantic_feature_label}]"
+                f"Adding result [{result_dict.get(feature.pydantic_feature_label, 'ERROR')}] for feature: [{feature.pydantic_feature_label}]"
             )
-            feature.add_result(result_dict[feature.pydantic_feature_label])
+            feature.add_result(result_dict.get(feature.pydantic_feature_label, "ERROR"))
 
 
 def get_triangulation_results(text, triangulation_llms, triangulation_results):
@@ -121,7 +124,7 @@ def extract_features(
     feature_collectors: list[WritingFeature],
     llm: Runnable[LanguageModelInput, BaseModel],
     triangulation_llms: list[Runnable[LanguageModelInput, BaseModel]] = None,
-):
+) -> Tuple[list[WritingFeature], list[str], dict[str, Any]]:
     """Extract features from the text based on the specified mode."""
     for feature in feature_collectors:
         feature.results.clear()
@@ -143,7 +146,7 @@ def extract_features_paragraph_mode(
     feature_collectors: list[WritingFeature],
     llm: Runnable[LanguageModelInput, BaseModel],
     triangulation_llms: list[Runnable[LanguageModelInput, BaseModel]] = None,
-):
+) -> Tuple[list[WritingFeature], list[str], dict[str, Any]]:
     """Extract features from the text in paragraph mode."""
     text_units = []
     text_metrics = []
@@ -157,7 +160,7 @@ def extract_features_paragraph_mode(
 
         logger.info("Saving results to CSV...")
         save_results_to_csv(feature_collectors, text_metrics, text_units)
-        # input("Press Enter to continue...")
+        input("Press Enter to continue...")
 
     log_processing_results(text_units, feature_collectors)
     return feature_collectors, text_units, text_metrics
@@ -168,10 +171,11 @@ def extract_features_section_mode(
     feature_collectors: list[WritingFeature],
     llm: Runnable[LanguageModelInput, BaseModel],
     triangulation_llms: list[Runnable[LanguageModelInput, BaseModel]] = None,
-):
+) -> Tuple[list[WritingFeature], list[str], dict[str, Any]]:
     """Extract features from the text in section mode."""
     text_units = []
     section_text_metrics = []
+    sections = combine_short_strings(sections, 50)
 
     for section in sections:
         process_text(section, feature_collectors, llm, triangulation_llms)
