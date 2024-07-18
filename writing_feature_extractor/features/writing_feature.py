@@ -80,4 +80,4 @@ class WritingFeature(ABC):
         elif self.result_collection_mode == ResultCollectionMode.FIELD_NAME:
             self.results.append(enum_value)
         else:
-            raise ValueError("Invalid graph mode")
+            raise ValueError("Invalid result collection mode")
