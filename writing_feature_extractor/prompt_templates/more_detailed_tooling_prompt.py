@@ -8,7 +8,7 @@ Remember:
 2. For subjective features, base your assessment on textual evidence and common literary interpretation techniques.
 3. Provide only the requested structured output without additional explanations.
 
-Creative writing sample:
+Creative writing sample with specified output format:
 -----
 {input}
 -----
