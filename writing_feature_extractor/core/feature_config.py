@@ -21,7 +21,30 @@ COLOR_MAP_KEY = "color_map"
 
 
 def load_feature_config(config_file: str) -> list[FeatureConfigData]:
-    """Load feature configuration from a YAML file."""
+    """
+    Load feature configuration from a YAML file.
+
+    This function reads a YAML configuration file and parses it to create a list of
+    FeatureConfigData objects. Each object represents a feature with its associated
+    settings such as name, levels, color map, and result collection mode.
+
+    Args:
+        config_file (str): Path to the YAML configuration file.
+
+    Returns:
+        list[FeatureConfigData]: A list of FeatureConfigData objects representing
+        the configured features.
+
+    Raises:
+        ConfigurationError: If the configuration file is invalid, missing, or contains
+        errors. This includes cases where required keys are missing, feature names are
+        invalid, or the YAML syntax is incorrect.
+
+    Example:
+        >>> features = load_feature_config("config.yaml")
+        >>> print(features[0].name)
+        'SentenceComplexity'
+    """
     try:
         with open(config_file, "r") as file:
             config = yaml.safe_load(file)
