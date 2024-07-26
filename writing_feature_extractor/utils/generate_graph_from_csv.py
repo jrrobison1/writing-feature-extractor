@@ -17,11 +17,26 @@ def generate_graph_from_csv(
     filename: str, bar_feature: str, color_feature: str
 ) -> None:
     """
-    Generate a graph from the saved CSV file using predefined colors and custom y-axis labels.
+    Generate a bar graph from a CSV file with custom colors and y-axis labels.
 
-    :param filename: Name of the CSV file to read results from
-    :param bar_feature: Name of the feature to use for bar heights
-    :param color_feature: Name of the feature to use for bar colors
+    This function reads data from a CSV file, creates a bar graph where the height
+    of each bar represents the 'bar_feature' value, and the color of each bar
+    represents the 'color_feature' value. The graph is saved as a PNG file.
+
+    Args:
+        filename (str): Path to the input CSV file.
+        bar_feature (str): Column name in the CSV to use for bar heights.
+        color_feature (str): Column name in the CSV to use for bar colors.
+
+    Raises:
+        FileOperationError: If the specified file is not found or cannot be read.
+        GraphError: If there's an error during graph generation.
+
+    Notes:
+        - The CSV file should contain 'Unit', 'Length', and 'ColorMaps' columns,
+          in addition to the columns specified by bar_feature and color_feature.
+        - The 'ColorMaps' column should contain a JSON string with color mappings.
+        - The output graph will be saved as '{bar_feature}_{color_feature}_graph.png'.
     """
     try:
         # Read the CSV file
