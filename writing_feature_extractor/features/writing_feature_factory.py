@@ -7,6 +7,27 @@ from writing_feature_extractor.core.custom_exceptions import (
     FeatureExtractorError,
     ModelError,
 )
+from writing_feature_extractor.features.aesthemos_features.five_point_scale.amusement import (
+    AesthemosAmusement,
+)
+from writing_feature_extractor.features.aesthemos_features.five_point_scale.animation import (
+    AesthemosAnimation,
+)
+from writing_feature_extractor.features.aesthemos_features.five_point_scale.beauty import (
+    AesthemosBeauty,
+)
+from writing_feature_extractor.features.aesthemos_features.five_point_scale.curiosity import (
+    AesthemosCuriosity,
+)
+from writing_feature_extractor.features.aesthemos_features.five_point_scale.distressed import (
+    AesthemosDistressed,
+)
+from writing_feature_extractor.features.aesthemos_features.five_point_scale.relaxation import (
+    AesthemosRelaxation,
+)
+from writing_feature_extractor.features.aesthemos_features.five_point_scale.sadness import (
+    AesthemosSadness,
+)
 from writing_feature_extractor.features.available_writing_features import (
     AvailableWritingFeatures,
 )
@@ -33,6 +54,13 @@ class WritingFeatureFactory:
         AvailableWritingFeatures.MOOD: MoodFeature,
         AvailableWritingFeatures.EMOTIONAL_INTENSITY: EmotionalIntensityFeature,
         AvailableWritingFeatures.LEVEL_OF_SUSPENSE: LevelOfSuspenseFeature,
+        AvailableWritingFeatures.AESTHEMOS_SADNESS: AesthemosSadness,
+        AvailableWritingFeatures.AESTHEMOS_AMUSEMENT: AesthemosAmusement,
+        AvailableWritingFeatures.AESTHEMOS_ANIMATION: AesthemosAnimation,
+        AvailableWritingFeatures.AESTHEMOS_BEAUTY: AesthemosBeauty,
+        AvailableWritingFeatures.AESTHEMOS_CURIOSITY: AesthemosCuriosity,
+        AvailableWritingFeatures.AESTHEMOS_DISTRESSED: AesthemosDistressed,
+        AvailableWritingFeatures.AESTHEMOS_RELAXATION: AesthemosRelaxation,
     }
 
     @staticmethod
@@ -47,7 +75,6 @@ class WritingFeatureFactory:
             selected_features = dict()
             feature_collectors = []
             for feature_config in features:
-
                 feature_class = WritingFeatureFactory.FEATURE_MAP.get(
                     feature_config.name
                 )
@@ -56,6 +83,9 @@ class WritingFeatureFactory:
                         feature_config
                     )
                 else:
+                    logger.info(
+                        f"Found static feature present in list. Feature: [{feature_config.name}]"
+                    )
                     current_feature = feature_class(
                         feature_config.result_collection_mode
                     )
