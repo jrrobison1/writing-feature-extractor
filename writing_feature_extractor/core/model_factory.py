@@ -9,6 +9,10 @@ from langchain_core.pydantic_v1 import BaseModel
 from langchain_core.runnables import Runnable
 
 from writing_feature_extractor.core.custom_exceptions import ModelError
+from writing_feature_extractor.prompt_templates.aesthemos_prompt_non_tooling_prompt import (
+    aesthemos_non_tooling_prompt,
+)
+from writing_feature_extractor.prompt_templates.aesthemos_prompt import aesthemos_prompt
 from writing_feature_extractor.prompt_templates.more_detailed_prompt import (
     more_detailed_prompt,
 )
@@ -16,6 +20,16 @@ from writing_feature_extractor.prompt_templates.more_detailed_tooling_prompt imp
     more_detailed_tooling_prompt,
 )
 from writing_feature_extractor.utils.logger_config import get_logger
+from writing_feature_extractor.prompt_templates.basic_prompt import basic_prompt
+from writing_feature_extractor.prompt_templates.advanced_emotional_intensity_prompt_tooling import (
+    advanced_emotional_intensity_prompt,
+)
+from writing_feature_extractor.prompt_templates.non_tooling_advanced_emotional_intensity_prompt import (
+    non_tooling_advanced_emotional_intensity_prompt,
+)
+from writing_feature_extractor.prompt_templates.non_tooling_advanced_descriptive_level_detail_prompt import (
+    non_tooling_advanced_descriptive_level_detail_prompt,
+)
 
 logger = get_logger(__name__)
 
@@ -56,7 +70,7 @@ def create_openai_model(
     from langchain_openai import ChatOpenAI
 
     try:
-        return more_detailed_tooling_prompt | ChatOpenAI(
+        return aesthemos_prompt | ChatOpenAI(
             model=model_name, temperature=0
         ).with_structured_output(PydanticModel)
     except Exception as e:
@@ -71,7 +85,7 @@ def create_anthropic_model(
     from langchain_anthropic import ChatAnthropic
 
     try:
-        return more_detailed_tooling_prompt | ChatAnthropic(
+        return aesthemos_prompt | ChatAnthropic(
             model=model_name, temperature=0
         ).with_structured_output(PydanticModel)
     except Exception as e:
@@ -86,7 +100,7 @@ def create_groq_model(
     from langchain_groq import ChatGroq
 
     try:
-        return more_detailed_tooling_prompt | ChatGroq(
+        return aesthemos_prompt | ChatGroq(
             model_name=model_name, temperature=0
         ).with_structured_output(PydanticModel)
     except Exception as e:
@@ -103,7 +117,7 @@ def create_gemini_model(
     try:
         parser = PydanticOutputParser(pydantic_object=PydanticModel)
         prompt = PromptTemplate(
-            template=more_detailed_prompt,
+            template=aesthemos_non_tooling_prompt,
             input_variables=["input"],
             partial_variables={"format_instructions": parser.get_format_instructions()},
         )
@@ -124,7 +138,7 @@ def create_openrouter_model(
         parser = PydanticOutputParser(pydantic_object=PydanticModel)
 
         prompt = PromptTemplate(
-            template=more_detailed_prompt,
+            template=aesthemos_non_tooling_prompt,
             input_variables=["input"],
             partial_variables={"format_instructions": parser.get_format_instructions()},
         )
