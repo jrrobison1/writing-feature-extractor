@@ -19,14 +19,23 @@ logger = get_logger(__name__)
 
 
 def process_feature_with_triangulation(
-    result: BaseModel, triangulation_results: list[Enum], feature: WritingFeature
-):
-    """Process a feature with triangulation results"""
+    result: BaseModel, triangulation_results: list[BaseModel], feature: WritingFeature
+) -> None:
+    """
+    Process a feature with triangulation results.
 
+    Args:
+        result (BaseModel): The main LLM result.
+        triangulation_results (list[BaseModel]): Results from triangulation LLMs.
+        feature (WritingFeature): The writing feature being processed.
+
+    This function compares the main LLM result with triangulation results and
+    determines the final result based on the feature's result collection mode.
+    """
     result_dict = result.dict()
-    feature_results = list(
+    feature_results = [
         res.dict()[feature.pydantic_feature_label] for res in triangulation_results
-    )
+    ]
 
     triangulated_result = result_dict[feature.pydantic_feature_label]
 
@@ -52,8 +61,8 @@ def process_feature_with_triangulation(
 
 
 def get_triangulated_number_representation(
-    feature: WritingFeature, result_dict: dict, feature_results: list[Enum]
-) -> Enum:
+    feature: WritingFeature, result_dict: dict[str, Any], feature_results: list[Enum]
+) -> float:
     tri_results_as_ints = [
         feature.get_int_for_enum(feature_result) for feature_result in feature_results
     ]
@@ -69,7 +78,7 @@ def get_triangulated_number_representation(
 
 
 def get_triangulated_mode(
-    feature: WritingFeature, result_dict: dict, feature_results: list[BaseModel]
+    feature: WritingFeature, result_dict: dict[str, Any], feature_results: list[Enum]
 ) -> Enum:
     feature_results.append(result_dict[feature.pydantic_feature_label])
     mode = max(set(feature_results), key=feature_results.count)
@@ -81,23 +90,31 @@ def process_text(
     text: str,
     feature_collectors: list[WritingFeature],
     llm: Runnable[LanguageModelInput, BaseModel],
-    triangulation_llms: list[Runnable[LanguageModelInput, BaseModel]] = None,
-):
-    """Run LLM on a text to perform feature extraction"""
+    triangulation_llms: list[Runnable[LanguageModelInput, BaseModel]] | None = None,
+) -> None:
+    """
+    Run LLM on a text to perform feature extraction.
 
+    Args:
+        text (str): The input text to process.
+        feature_collectors (list[WritingFeature]): List of writing features to extract.
+        llm (Runnable[LanguageModelInput, BaseModel]): The main language model.
+        triangulation_llms (list[Runnable[LanguageModelInput, BaseModel]] | None):
+            Optional list of triangulation language models.
+
+    This function processes the input text using the main LLM and optional
+    triangulation LLMs to extract writing features.
+    """
     triangulation_results = []
     try:
         result = llm.invoke(input=text)
         logger.debug(f"LLM Result: [{str(result)}]")
+        result_dict = result.dict()
         if triangulation_llms:
             get_triangulation_results(text, triangulation_llms, triangulation_results)
     except Exception as e:
         logger.error("Error invoking the LLM", e)
         logger.debug(f"Text: {text},  llm: {llm}")
-
-    if result:
-        result_dict = result.dict()
-    else:
         result_dict = {}
 
     for feature in feature_collectors:
@@ -110,7 +127,11 @@ def process_text(
             feature.add_result(result_dict.get(feature.pydantic_feature_label, "ERROR"))
 
 
-def get_triangulation_results(text, triangulation_llms, triangulation_results):
+def get_triangulation_results(
+    text: str,
+    triangulation_llms: list[Runnable[LanguageModelInput, BaseModel]],
+    triangulation_results: list[BaseModel],
+) -> Runnable[LanguageModelInput, BaseModel]:
     for llm in triangulation_llms:
         tri_result = llm.invoke(input=text)
         triangulation_results.append(tri_result)
@@ -118,27 +139,50 @@ def get_triangulation_results(text, triangulation_llms, triangulation_results):
     return llm
 
 
+class ExtractionMode(Enum):
+    PARAGRAPH = "paragraph"
+    SECTION = "section"
+
+
 def extract_features(
     sections: list[str],
-    mode: str,
+    mode: ExtractionMode,
     feature_collectors: list[WritingFeature],
     llm: Runnable[LanguageModelInput, BaseModel],
     triangulation_llms: list[Runnable[LanguageModelInput, BaseModel]] = None,
 ) -> Tuple[list[WritingFeature], list[str], dict[str, Any]]:
-    """Extract features from the text based on the specified mode."""
+    """
+    Extract features from the text based on the specified mode.
+
+    Args:
+        sections (list[str]): List of text sections to process.
+        mode (ExtractionMode): The extraction mode (PARAGRAPH or SECTION).
+        feature_collectors (list[WritingFeature]): List of writing features to extract.
+        llm (Runnable[LanguageModelInput, BaseModel]): The main language model.
+        triangulation_llms (list[Runnable[LanguageModelInput, BaseModel]]):
+            Optional list of triangulation language models.
+
+    Returns:
+        Tuple[list[WritingFeature], list[str], dict[str, Any]]:
+            A tuple containing the updated feature collectors, processed text units,
+            and text metrics.
+
+    Raises:
+        ValueError: If an invalid extraction mode is provided.
+    """
     for feature in feature_collectors:
         feature.results.clear()
 
-    if mode == "paragraph":
+    if mode == ExtractionMode.PARAGRAPH:
         return extract_features_paragraph_mode(
             sections, feature_collectors, llm, triangulation_llms
         )
-    elif mode == "section":
+    elif mode == ExtractionMode.SECTION:
         return extract_features_section_mode(
             sections, feature_collectors, llm, triangulation_llms
         )
     else:
-        raise ValueError(f"Invalid mode: {mode}. Must be 'paragraph' or 'section'.")
+        raise ValueError(f"Invalid mode: {mode}. Must be a valid ExtractionMode.")
 
 
 def extract_features_paragraph_mode(
@@ -147,7 +191,21 @@ def extract_features_paragraph_mode(
     llm: Runnable[LanguageModelInput, BaseModel],
     triangulation_llms: list[Runnable[LanguageModelInput, BaseModel]] = None,
 ) -> Tuple[list[WritingFeature], list[str], dict[str, Any]]:
-    """Extract features from the text in paragraph mode."""
+    """
+    Extract features from the text in paragraph mode.
+
+    Args:
+        sections (list[str]): List of text sections to process.
+        feature_collectors (list[WritingFeature]): List of writing features to extract.
+        llm (Runnable[LanguageModelInput, BaseModel]): The main language model.
+        triangulation_llms (list[Runnable[LanguageModelInput, BaseModel]]):
+            Optional list of triangulation language models.
+
+    Returns:
+        Tuple[list[WritingFeature], list[str], dict[str, Any]]:
+            A tuple containing the updated feature collectors, processed paragraphs,
+            and text metrics for each paragraph.
+    """
     text_units = []
     text_metrics = []
 
@@ -172,15 +230,32 @@ def extract_features_section_mode(
     llm: Runnable[LanguageModelInput, BaseModel],
     triangulation_llms: list[Runnable[LanguageModelInput, BaseModel]] = None,
 ) -> Tuple[list[WritingFeature], list[str], dict[str, Any]]:
-    """Extract features from the text in section mode."""
+    """
+    Extract features from the text in section mode.
+
+    Args:
+        sections (list[str]): List of text sections to process.
+        feature_collectors (list[WritingFeature]): List of writing features to extract.
+        llm (Runnable[LanguageModelInput, BaseModel]): The main language model.
+        triangulation_llms (list[Runnable[LanguageModelInput, BaseModel]]):
+            Optional list of triangulation language models.
+
+    Returns:
+        Tuple[list[WritingFeature], list[str], dict[str, Any]]:
+            A tuple containing the updated feature collectors, processed sections,
+            and text metrics for each section.
+    """
     text_units = []
     section_text_metrics = []
     sections = combine_short_strings(sections, 50)
+    section_number = 1
 
     for section in sections:
+        logger.info(f"Processing section number {section_number}")
         process_text(section, feature_collectors, llm, triangulation_llms)
         section_text_metrics.append(get_text_statistics(section))
         text_units.append(section)
+        section_number += 1
 
     log_processing_results(text_units, feature_collectors)
     return feature_collectors, text_units, section_text_metrics
@@ -188,7 +263,7 @@ def extract_features_section_mode(
 
 def log_processing_results(
     text_units: list[str], feature_collectors: list[WritingFeature]
-):
+) -> None:
     """Log the results of text processing."""
     logger.debug(f"Number of text units processed: {len(text_units)}")
     logger.debug(
