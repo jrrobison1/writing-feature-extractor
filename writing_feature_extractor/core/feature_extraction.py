@@ -62,7 +62,18 @@ def process_feature_with_triangulation(
 
 def get_triangulated_number_representation(
     feature: WritingFeature, result_dict: dict[str, Any], feature_results: list[Enum]
-) -> float:
+) -> Enum:
+    """
+    Calculate the triangulated result for number representation features.
+
+    Args:
+        feature (WritingFeature): The writing feature being processed.
+        result_dict (dict[str, Any]): The main LLM result as a dictionary.
+        feature_results (list[Enum]): Results from triangulation LLMs.
+
+    Returns:
+        Enum: The triangulated result as an Enum value.
+    """
     tri_results_as_ints = [
         feature.get_int_for_enum(feature_result) for feature_result in feature_results
     ]
@@ -80,6 +91,17 @@ def get_triangulated_number_representation(
 def get_triangulated_mode(
     feature: WritingFeature, result_dict: dict[str, Any], feature_results: list[Enum]
 ) -> Enum:
+    """
+    Calculate the triangulated result using mode for non-number representation features.
+
+    Args:
+        feature (WritingFeature): The writing feature being processed.
+        result_dict (dict[str, Any]): The main LLM result as a dictionary.
+        feature_results (list[Enum]): Results from triangulation LLMs.
+
+    Returns:
+        Enum: The most common (mode) result among all LLMs.
+    """
     feature_results.append(result_dict[feature.pydantic_feature_label])
     mode = max(set(feature_results), key=feature_results.count)
 
@@ -131,12 +153,19 @@ def get_triangulation_results(
     text: str,
     triangulation_llms: list[Runnable[LanguageModelInput, BaseModel]],
     triangulation_results: list[BaseModel],
-) -> Runnable[LanguageModelInput, BaseModel]:
+) -> None:
+    """
+    Get results from triangulation LLMs and append them to the triangulation_results list.
+
+    Args:
+        text (str): The input text to process.
+        triangulation_llms (list[Runnable[LanguageModelInput, BaseModel]]): List of triangulation language models.
+        triangulation_results (list[BaseModel]): List to store the results from triangulation LLMs.
+    """
     for llm in triangulation_llms:
         tri_result = llm.invoke(input=text)
         triangulation_results.append(tri_result)
         logger.debug(f"Triangulation Member LLM Result: [{str(tri_result)}]")
-    return llm
 
 
 class ExtractionMode(Enum):
@@ -264,7 +293,13 @@ def extract_features_section_mode(
 def log_processing_results(
     text_units: list[str], feature_collectors: list[WritingFeature]
 ) -> None:
-    """Log the results of text processing."""
+    """
+    Log the results of text processing.
+
+    Args:
+        text_units (list[str]): List of processed text units (paragraphs or sections).
+        feature_collectors (list[WritingFeature]): List of writing features with collected results.
+    """
     logger.debug(f"Number of text units processed: {len(text_units)}")
     logger.debug(
         f"Number of results in each feature collector: {[len(fc.results) for fc in feature_collectors]}"
