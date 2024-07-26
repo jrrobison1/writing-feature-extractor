@@ -18,11 +18,27 @@ def save_results_to_csv(
     filename: str = DEFAULT_CSV_FILE,
 ) -> None:
     """
-    Save the results of all features to a CSV file.
+    Save the results of all features and text metrics to a CSV file.
 
-    :param feature_collectors: List of feature collector objects
-    :param text_units: List of text units (paragraphs or sections)
-    :param filename: Name of the CSV file to save results
+    Args:
+        feature_collectors (List[WritingFeature]): List of WritingFeature objects containing feature results.
+        text_metrics (list[dict[str, Any]]): List of dictionaries containing text metrics for each text unit.
+        text_units (List[str]): List of text units (e.g., sentences, paragraphs) analyzed.
+        filename (str, optional): Name of the output CSV file. Defaults to DEFAULT_CSV_FILE.
+
+    Raises:
+        FileOperationError: If there's an error while saving the results to the CSV file.
+
+    The CSV file will contain the following columns:
+    - Unit: Index of the text unit
+    - Length: Word count of the text unit
+    - Feature columns: One column for each feature in feature_collectors
+    - Metric columns: One column for each metric in text_metrics
+    - ColorMaps: JSON-encoded color maps for each feature
+
+    Note:
+        This function assumes that the length of text_units matches the number of results in each feature collector
+        and the number of entries in text_metrics.
     """
     try:
         with open(filename, "w", newline="") as csvfile:

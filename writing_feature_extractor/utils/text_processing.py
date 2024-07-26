@@ -8,6 +8,18 @@ logger = get_logger(__name__)
 
 
 def load_text(file_path: str) -> str:
+    """
+    Load text content from a file.
+
+    Args:
+        file_path (str): The path to the file to be read.
+
+    Returns:
+        str: The content of the file as a string.
+
+    Raises:
+        FileOperationError: If there's an error reading the file.
+    """
     try:
         with open(file_path) as f:
             return f.read()
@@ -17,9 +29,27 @@ def load_text(file_path: str) -> str:
 
 
 def split_into_sections(text: str) -> List[str]:
+    """
+    Split the input text into sections using the SECTION_DELIMITER.
+
+    Args:
+        text (str): The input text to be split.
+
+    Returns:
+        List[str]: A list of text sections.
+    """
     return text.split(SECTION_DELIMITER)
 
 
 def split_into_paragraphs(section: str) -> List[str]:
+    """
+    Split a section of text into paragraphs and combine short strings.
+
+    Args:
+        section (str): The section of text to be split into paragraphs.
+
+    Returns:
+        List[str]: A list of paragraphs, with short strings combined.
+    """
     paragraphs = section.split("\n")
     return combine_short_strings(paragraphs)

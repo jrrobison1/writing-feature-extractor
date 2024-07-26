@@ -9,8 +9,16 @@ NUMBER_OF_CHARACTERS_TO_SHOW_WHEN_COMBINING = 20
 
 
 def calculate_dialogue_percentage(text: str) -> float:
-    """Calculate the percentage of text that is within dialogue tags"""
+    """
+    Calculate the percentage of text that is within dialogue tags.
 
+    Args:
+        text (str): The input text to analyze.
+
+    Returns:
+        str: The percentage of dialogue in the text, formatted as a string with two decimal places and a '%' symbol.
+              Returns '0' if an error occurs during calculation.
+    """
     try:
         dialogue_pattern = r'"[^"]*"'
         dialogues = re.findall(dialogue_pattern, text, re.DOTALL)
@@ -31,10 +39,20 @@ def calculate_dialogue_percentage(text: str) -> float:
 def combine_short_strings(
     strings: list[str], minimum_words: int = MININUM_WORDS_PER_PARAGRAPH
 ) -> list[str]:
-    """Combine short strings (less than minimum_words) with the next string in the list.
-    This is useful for pieces of text that are too small for an LLM to make inference
-    for feature extraction"""
+    """
+    Combine short strings with the next string in the list if they contain fewer than the specified minimum words.
 
+    This is useful for consolidating text segments that are too small for an LLM to make accurate inferences
+    during feature extraction.
+
+    Args:
+        strings (list[str]): A list of strings to process.
+        minimum_words (int, optional): The minimum number of words a string should contain.
+                                       Defaults to MININUM_WORDS_PER_PARAGRAPH.
+
+    Returns:
+        list[str]: A new list with short strings combined. If an error occurs, returns the original list.
+    """
     for string in strings:
         if len(string) == 0:
             logger.info("Removing empty string from list of strings")
@@ -60,8 +78,26 @@ def combine_short_strings(
 
 
 def get_text_statistics(text: str) -> dict[str]:
-    """Get statistics about the text, such as readability"""
+    """
+    Calculate various statistics about the given text.
 
+    Args:
+        text (str): The input text to analyze.
+
+    Returns:
+        dict[str]: A dictionary containing the following text statistics:
+            - dialogue_percentage: Percentage of text within dialogue tags
+            - readability_ease: Flesch Reading Ease score
+            - readability_grade: Flesch-Kincaid Grade Level
+            - sentence_count: Number of sentences
+            - word_count: Number of words
+            - syllable_count: Number of syllables
+            - average_words_per_sentence: Average number of words per sentence
+            - average_syllables_per_word: Average number of syllables per word
+
+    Note:
+        Returns an empty dictionary if an error occurs during calculation.
+    """
     try:
         text_statistics = dict()
         text_statistics["dialogue_percentage"] = calculate_dialogue_percentage(text)
