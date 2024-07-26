@@ -1,74 +1,88 @@
 features:
-  - name: EMOTIONAL_INTENSITY
+  # - name: EMOTIONAL_INTENSITY
+  #   result_collection_mode: NUMBER_REPRESENTATION
+  # - name: MOOD
+  #   result_collection_mode: FIELD_NAME
+  # - name: PACING
+  #   result_collection_mode: NUMBER_REPRESENTATION
+  # - name: LEVEL_OF_SUSPENSE
+  #   result_collection_mode: NUMBER_REPRESENTATION
+  - name: AESTHEMOS_BEAUTY
     result_collection_mode: NUMBER_REPRESENTATION
-  - name: MOOD
-    result_collection_mode: FIELD_NAME
-  - name: PACING
+  - name: AESTHEMOS_AMUSEMENT
     result_collection_mode: NUMBER_REPRESENTATION
-  - name: LEVEL_OF_SUSPENSE
+  - name: AESTHEMOS_ANIMATION
     result_collection_mode: NUMBER_REPRESENTATION
-  - name: "Smell Sensory Detail Level"
+  - name: AESTHEMOS_CURIOSITY
     result_collection_mode: NUMBER_REPRESENTATION
-    customizations:
-      levels:
-        - "none"
-        - "low"
-        - "medium"
-        - "high"
-      color_map:
-        "0": "#FFFFFF"
-        "1": "#CC99CC"
-        "2": "#CC99CC"
-        "3": "#800080"
-  - name: "Humor Level"
+  - name: AESTHEMOS_DISTRESSED
     result_collection_mode: NUMBER_REPRESENTATION
-    customizations:
-      levels:
-        - "none"
-        - "low"
-        - "medium"
-        - "high"
-      color_map:
-        "0": "#FFFFFF"
-        "1": "#FFE5CC"
-        "2": "#FFB266"
-        "3": "#FF8C00"
-  - name: "Romance Level"
+  - name: AESTHEMOS_RELAXATION
     result_collection_mode: NUMBER_REPRESENTATION
-    customizations:
-      levels:
-        - "none"
-        - "low"
-        - "medium"
-        - "high"
-      color_map:
-        "0": "#FFFFFF"
-        "1": "#FFE5CC"
-        "2": "#FFB266"
-        "3": "#FF8C00"
-  - name: "Mystery Level"
+  - name: AESTHEMOS_SADNESS
     result_collection_mode: NUMBER_REPRESENTATION
-    customizations:
-      levels:
-        - "none"
-        - "low"
-        - "medium"
-        - "high"
-      color_map:
-        "0": "#FFFFFF"
-        "1": "#CC99CC"
-        "2": "#CC99CC"
-        "3": "#800080"
-  - name: "Descriptive Detail Level"
-    result_collection_mode: NUMBER_REPRESENTATION
-    customizations:
-      levels:
-        - "none"
-        - "low"
-        - "medium"
-        - "high"
-      color_map:
-        "0": "#FFFFFF"
-        "1": "#FFE5CC"
-        "2": "#FFB266"
-        "3": "#FF8C00"
+  # - name: "Smell Sensory Detail Level"
+  #   result_collection_mode: NUMBER_REPRESENTATION
+  #   customizations:
+  #     levels:
+  #       - "none"
+  #       - "low"
+  #       - "medium"
+  #       - "high"
+  #     color_map:
+  #       "0": "#FFFFFF"
+  #       "1": "#CC99CC"
+  #       "2": "#CC99CC"
+  #       "3": "#800080"
+  # - name: "Humor Level"
+  #   result_collection_mode: NUMBER_REPRESENTATION
+  #   customizations:
+  #     levels:
+  #       - "none"
+  #       - "low"
+  #       - "medium"
+  #       - "high"
+  #     color_map:
+  #       "0": "#FFFFFF"
+  #       "1": "#FFE5CC"
+  #       "2": "#FFB266"
+  #       "3": "#FF8C00"
+  # - name: "Romance Level"
+  #   result_collection_mode: NUMBER_REPRESENTATION
+  #   customizations:
+  #     levels:
+  #       - "none"
+  #       - "low"
+  #       - "medium"
+  #       - "high"
+  #     color_map:
+  #       "0": "#FFFFFF"
+  #       "1": "#FFE5CC"
+  #       "2": "#FFB266"
+  #       "3": "#FF8C00"
+  # - name: "Mystery Level"
+  #   result_collection_mode: NUMBER_REPRESENTATION
+  #   customizations:
+  #     levels:
+  #       - "none"
+  #       - "low"
+  #       - "medium"
+  #       - "high"
+  #     color_map:
+  #       "0": "#FFFFFF"
+  #       "1": "#CC99CC"
+  #       "2": "#CC99CC"
+  #       "3": "#800080"
+  # - name: "Descriptive Detail Level"
+  #   result_collection_mode: NUMBER_REPRESENTATION
+  #   customizations:
+  #     levels:
+  #       - "none"
+  #       - "low"
+  #       - "medium"
+  #       - "high"
+  #     color_map:
+  #       "0": "#FFFFFF"
+  #       "1": "#FFE5CC"
+  #       "2": "#FFB266"
+  #       "3": "#FF8C00"
