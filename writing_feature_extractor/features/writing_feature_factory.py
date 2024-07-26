@@ -46,8 +46,12 @@ logger = get_logger(__name__)
 
 
 class WritingFeatureFactory:
-    """Factory class to create dynamic pydantic models based on the given
-    writing features desired for feature extraction."""
+    """
+    Factory class for creating dynamic Pydantic models based on specified writing features.
+
+    This class provides methods to generate custom Pydantic models and feature collectors
+    for various writing features, including both predefined and generic features.
+    """
 
     FEATURE_MAP: Dict[AvailableWritingFeatures, Type[WritingFeature]] = {
         AvailableWritingFeatures.PACING: PaceFeature,
@@ -67,7 +71,21 @@ class WritingFeatureFactory:
     def get_dynamic_model(
         features: list[FeatureConfigData],
     ) -> Tuple[type[BaseModel], list[WritingFeature]]:
-        """Creates a dynamic pydantic model based on the given writing features"""
+        """
+        Create a dynamic Pydantic model based on the given writing features.
+
+        Args:
+            features (list[FeatureConfigData]): List of feature configurations.
+
+        Returns:
+            Tuple[type[BaseModel], list[WritingFeature]]: A tuple containing:
+                - The dynamically created Pydantic model class.
+                - A list of WritingFeature instances for feature collection.
+
+        Raises:
+            ModelError: If no features are provided.
+            FeatureExtractorError: If there's an error during model creation.
+        """
         if features is None or not features:
             raise ModelError("No features provided for dynamic model creation")
 
@@ -123,8 +141,15 @@ class WritingFeatureFactory:
     def create_generic_feature(
         feature_config: FeatureConfigData,
     ) -> GenericFeature:
-        """Creates a generic writing feature based on the given feature name"""
+        """
+        Create a generic writing feature based on the given feature configuration.
 
+        Args:
+            feature_config (FeatureConfigData): Configuration for the generic feature.
+
+        Returns:
+            GenericFeature: An instance of GenericFeature with the specified configuration.
+        """
         enum_name = (
             feature_config.name.lower().replace("_", " ").title().replace(" ", "")
         )
@@ -147,7 +172,17 @@ class WritingFeatureFactory:
         )
 
     @staticmethod
-    def create_dynamic_enum(enum_name, values) -> Enum:
+    def create_dynamic_enum(enum_name: str, values: list[str]) -> Enum:
+        """
+        Create a dynamic Enum class based on the given name and values.
+
+        Args:
+            enum_name (str): Name of the Enum class to be created.
+            values (list[str]): List of string values for the Enum.
+
+        Returns:
+            Enum: A dynamically created Enum class.
+        """
         return Enum(
             enum_name,
             {value.upper(): value for value in values},
